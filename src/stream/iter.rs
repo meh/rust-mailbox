@@ -202,9 +202,7 @@ mod test {
 		let mut iter = Iter::new(Cursor::new("From meh@schizofreni.co Wed Nov 17 14:35:53 2010\r\nSubject: I like trains\r\nFoo: bar\r\n baz\r\n\r\nHi!\r\n"));
 
 		{
-			let item = iter.next();
-			assert!(item.is_some());
-			if let Entry::Begin(item) = item.unwrap().unwrap() {
+			if let Entry::Begin(item) = iter.next().unwrap().unwrap() {
 				assert_eq!(item.address, "meh@schizofreni.co");
 				assert_eq!(item.timestamp, "Wed Nov 17 14:35:53 2010");
 			}
@@ -214,9 +212,7 @@ mod test {
 		}
 
 		{
-			let item = iter.next();
-			assert!(item.is_some());
-			if let Entry::Header(item) = item.unwrap().unwrap() {
+			if let Entry::Header(item) = iter.next().unwrap().unwrap() {
 				assert_eq!(item.key, "Subject");
 				assert_eq!(item.value, "I like trains");
 			}
@@ -226,9 +222,7 @@ mod test {
 		}
 
 		{
-			let item = iter.next();
-			assert!(item.is_some());
-			if let Entry::Header(item) = item.unwrap().unwrap() {
+			if let Entry::Header(item) = iter.next().unwrap().unwrap() {
 				assert_eq!(item.key, "Foo");
 				assert_eq!(item.value, "bar baz");
 			}
