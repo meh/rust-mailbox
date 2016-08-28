@@ -1,0 +1,20 @@
+[package]
+name    = "mailbox"
+version = "0.1.0"
+
+authors = ["meh. <meh@schizofreni.co>"]
+license = "WTFPL"
+
+description = "MBOX reader."
+repository  = "https://github.com/meh/rust-mailbox"
+keywords    = ["mail", "mbox"]
+
+[dependencies]
+lazy_static = "0.1"
+bitflags    = "0.7"
+
+regex  = "0.1"
+chrono = "0.2"
+mime   = "0.2"
+
+nix = "0.3"
