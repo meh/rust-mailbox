@@ -25,14 +25,17 @@ pub struct Address {
 }
 
 impl Address {
+	#[inline]
 	pub fn name(&self) -> Option<&str> {
 		self.name.as_ref().map(|v| v.as_ref())
 	}
 
+	#[inline]
 	pub fn user(&self) -> &str {
 		&self.user
 	}
 
+	#[inline]
 	pub fn host(&self) -> &str {
 		&self.host
 	}

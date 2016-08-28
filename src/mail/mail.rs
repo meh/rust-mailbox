@@ -23,6 +23,7 @@ pub struct Mail {
 }
 
 impl Mail {
+	#[inline]
 	pub fn new(origin: stream::entry::Begin, headers: Headers, body: Vec<Vec<u8>>) -> Self {
 		Mail {
 			origin:  origin,
@@ -31,14 +32,17 @@ impl Mail {
 		}
 	}
 
+	#[inline]
 	pub fn origin(&self) -> &stream::entry::Begin {
 		&self.origin
 	}
 
+	#[inline]
 	pub fn headers(&self) -> &Headers {
 		&self.headers
 	}
 
+	#[inline]
 	pub fn body(&self) -> &Vec<Vec<u8>> {
 		&self.body
 	}

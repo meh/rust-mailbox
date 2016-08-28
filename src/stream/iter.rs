@@ -62,6 +62,7 @@ enum State {
 }
 
 impl<R: Read> Iter<R> {
+	#[inline]
 	pub fn new(input: R) -> Self {
 		Iter {
 			input: Lines(BufReader::new(input)),

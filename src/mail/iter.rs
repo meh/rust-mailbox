@@ -22,6 +22,7 @@ pub struct Iter<R: Read> {
 }
 
 impl<R: Read> Iter<R> {
+	#[inline]
 	pub fn new(input: R) -> Self {
 		Iter {
 			input: stream::read(input),
@@ -29,6 +30,7 @@ impl<R: Read> Iter<R> {
 		}
 	}
 
+	#[inline]
 	pub fn body(&mut self, value: bool) -> &mut Self {
 		self.body = value;
 		self

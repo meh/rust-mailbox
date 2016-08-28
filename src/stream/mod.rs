@@ -20,6 +20,7 @@ pub use self::iter::Iter;
 
 use std::io::Read;
 
+#[inline]
 pub fn read<R: Read>(input: R) -> Iter<R> {
 	Iter::new(input)
 }

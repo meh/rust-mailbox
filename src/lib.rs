@@ -30,6 +30,7 @@ pub use mail::Mail;
 
 use std::io::Read;
 
+#[inline]
 pub fn read<R: Read>(input: R) -> mail::Iter<R> {
 	mail::read(input)
 }
