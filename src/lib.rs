@@ -23,8 +23,6 @@ extern crate regex;
 extern crate chrono;
 extern crate mime;
 
-extern crate nix;
-
 pub mod stream;
 
 pub mod mail;

@@ -17,5 +17,3 @@ case   = "0.0.1"
 regex  = "0.1"
 chrono = "0.2"
 mime   = "0.2"
-
-nix = "0.3"
