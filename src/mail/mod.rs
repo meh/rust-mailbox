@@ -15,8 +15,11 @@
 mod mail;
 pub use self::mail::Mail;
 
-pub mod header;
-pub use self::header::{Header, Headers};
+mod headers;
+pub use self::headers::Headers;
+
+mod header;
+pub use self::header::Header;
 
 pub mod status;
 pub use self::status::Status;

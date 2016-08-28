@@ -18,6 +18,7 @@ extern crate lazy_static;
 #[macro_use]
 extern crate bitflags;
 
+extern crate case;
 extern crate regex;
 extern crate chrono;
 extern crate mime;

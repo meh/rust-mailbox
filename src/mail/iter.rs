@@ -14,17 +14,24 @@
 
 use std::io::{self, Read};
 use stream::{self, Entry};
-use super::{Mail, Headers, Header};
+use super::{Mail, Headers};
 
 pub struct Iter<R: Read> {
 	input: stream::Iter<R>,
+	body:  bool,
 }
 
 impl<R: Read> Iter<R> {
 	pub fn new(input: R) -> Self {
 		Iter {
 			input: stream::read(input),
+			body:  true,
 		}
+	}
+
+	pub fn body(&mut self, value: bool) -> &mut Self {
+		self.body = value;
+		self
 	}
 }
 
@@ -76,13 +83,8 @@ impl<R: Read> Iterator for Iter<R> {
 				Entry::Escape(_) => (),
 
 				// TODO(meh): handle multiple headers with same name
-				Entry::Header(header) => {
-					if let Ok(value) = Header::parse(header.key(), header.value()) {
-						headers.insert(header.key().into(), value);
-					}
-					else {
-						headers.insert(header.key().into(), Header::Value(header.value().into()));
-					}
+				Entry::Header(stream::entry::Header { key, value }) => {
+					headers.insert(key, value);
 				}
 
 				Entry::Body(value) => {

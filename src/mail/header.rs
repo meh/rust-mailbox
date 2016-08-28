@@ -12,18 +12,14 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-use std::collections::HashMap;
 use std::io;
 use std::str::FromStr;
 use std::net::IpAddr;
 use mime::Mime;
 use super::{Status, Address, Date};
 
-pub type Headers = HashMap<String, Header>;
-
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub enum Header {
-	Value(String),
 	Status(Status),
 
 	From(Address),
@@ -40,49 +36,44 @@ pub enum Header {
 }
 
 impl Header {
-	pub fn parse<T: AsRef<str>, T2: AsRef<str>>(name: T, value: T2) -> io::Result<Self> {
+	pub fn parse<T: AsRef<str>, T2: AsRef<str>, T3: AsRef<[T2]>>(name: T, value: T3) -> io::Result<Self> {
 		let name  = name.as_ref();
 		let value = value.as_ref();
 
 		Ok(match name {
 			"From" | "X-Envelope-From" =>
-				Header::From(try!(Address::from_str(value))),
+				Header::From(try!(Address::from_str(value[0].as_ref()))),
 
 			"To" | "Reply-To" | "Delivered-To" | "Return-Path" =>
-				Header::To(try!(Address::from_str(value))),
+				Header::To(try!(Address::from_str(value[0].as_ref()))),
 
 			"Cc" =>
-				Header::Cc(try!(value.split(',').map(|v| Address::from_str(v)).collect())),
+				Header::Cc(try!(value[0].as_ref().split(',').map(|v| Address::from_str(v)).collect())),
 
 			"Date" =>
-				Header::Date(try!(Date::from_str(value))),
+				Header::Date(try!(Date::from_str(value[0].as_ref()))),
 
 			"Status" | "X-Status" =>
-				Header::Status(try!(Status::from_str(value))),
+				Header::Status(try!(Status::from_str(value[0].as_ref()))),
 
 			"X-Remote-Addr" =>
-				Header::RemoteAddr(try!(IpAddr::from_str(value).map_err(|_|
+				Header::RemoteAddr(try!(IpAddr::from_str(value[0].as_ref()).map_err(|_|
 					io::Error::new(io::ErrorKind::InvalidInput, "invalid IP address")))),
 
 			"Content-Length" =>
-				Header::ContentLength(try!(value.parse().map_err(|_|
+				Header::ContentLength(try!(value[0].as_ref().parse().map_err(|_|
 					io::Error::new(io::ErrorKind::InvalidInput, "invalid content length")))),
 
 			"Content-Type" =>
-				Header::ContentType(try!(Mime::from_str(value).map_err(|_|
+				Header::ContentType(try!(Mime::from_str(value[0].as_ref()).map_err(|_|
 					io::Error::new(io::ErrorKind::InvalidInput, "invalid MIME type")))),
 
 			"Lines" =>
-				Header::Lines(try!(value.parse().map_err(|_|
+				Header::Lines(try!(value[0].as_ref().parse().map_err(|_|
 					io::Error::new(io::ErrorKind::InvalidInput, "invalid content length")))),
 
 			_ =>
-				Header::Value(value.into()),
+				return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid content length"))
 		})
 	}
-}
-
-#[cfg(test)]
-mod test {
-
 }

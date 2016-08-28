@@ -136,6 +136,13 @@ mod test {
 	}
 
 	#[test]
+	fn parse_no_name_quoted() {
+		let v = Address::from_str(r#"<culo@culetto>"#).unwrap();
+		assert_eq!(v.user(), "culo");
+		assert_eq!(v.host(), "culetto");
+	}
+
+	#[test]
 	fn fail() {
 		assert!(Address::from_str("hue").is_err());
 	}
