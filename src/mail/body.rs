@@ -12,33 +12,21 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-mod mail;
-pub use self::mail::Mail;
+#[derive(PartialEq, Eq, Clone, Debug)]
+pub struct Body {
+	data: Vec<Vec<u8>>,
+}
 
-mod headers;
-pub use self::headers::Headers;
+impl Body {
+	#[inline]
+	pub fn new() -> Self {
+		Body {
+			data: Vec::new(),
+		}
+	}
 
-mod header;
-pub use self::header::Header;
-
-mod body;
-pub use self::body::Body;
-
-pub mod status;
-pub use self::status::Status;
-
-mod address;
-pub use self::address::Address;
-
-mod date;
-pub use self::date::Date;
-
-mod iter;
-pub use self::iter::Iter;
-
-use std::io::Read;
-
-#[inline]
-pub fn read<R: Read>(input: R) -> Iter<R> {
-	Iter::new(input)
+	#[inline]
+	pub fn append(&mut self, data: Vec<u8>) {
+		self.data.push(data);
+	}
 }

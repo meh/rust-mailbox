@@ -14,7 +14,7 @@
 
 use std::io::{self, Read};
 use stream::{self, Entry};
-use super::{Mail, Headers};
+use super::{Mail, Headers, Body};
 
 pub struct Iter<R: Read> {
 	input: stream::Iter<R>,
@@ -72,7 +72,7 @@ impl<R: Read> Iterator for Iter<R> {
 		};
 
 		let mut headers = Headers::new();
-		let mut body    = Vec::new();
+		let mut body    = Body::new();
 		let mut ended   = false;
 
 		// Read headers.
@@ -91,7 +91,7 @@ impl<R: Read> Iterator for Iter<R> {
 
 				Entry::Body(value) => {
 					if self.body {
-						body.push(value);
+						body.append(value);
 					}
 
 					break;
@@ -108,7 +108,7 @@ impl<R: Read> Iterator for Iter<R> {
 		if !ended {
 			while let Entry::Body(value) = try!(eof!(self.input.next())) {
 				if self.body {
-					body.push(value);
+					body.append(value);
 				}
 			}
 		}

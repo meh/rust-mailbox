@@ -13,18 +13,18 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use stream;
-use super::Headers;
+use super::{Headers, Body};
 
 #[derive(Clone, Debug)]
 pub struct Mail {
 	origin:  stream::entry::Begin,
 	headers: Headers,
-	body:    Vec<Vec<u8>>,
+	body:    Body,
 }
 
 impl Mail {
 	#[inline]
-	pub fn new(origin: stream::entry::Begin, headers: Headers, body: Vec<Vec<u8>>) -> Self {
+	pub fn new(origin: stream::entry::Begin, headers: Headers, body: Body) -> Self {
 		Mail {
 			origin:  origin,
 			headers: headers,
@@ -43,7 +43,7 @@ impl Mail {
 	}
 
 	#[inline]
-	pub fn body(&self) -> &Vec<Vec<u8>> {
+	pub fn body(&self) -> &Body {
 		&self.body
 	}
 }
