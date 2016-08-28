@@ -195,7 +195,7 @@ impl<R: Read> Iterator for Iter<R> {
 mod test {
 	use std::io::Cursor;
 	use super::*;
-	use super::super::{entry, Entry};
+	use super::super::Entry;
 
 	#[test]
 	fn simple() {
