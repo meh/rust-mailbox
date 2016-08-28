@@ -26,18 +26,8 @@ pub enum Entry {
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Begin {
-	address:   String,
-	timestamp: String,
-}
-
-impl Begin {
-	pub fn address(&self) -> &str {
-		&self.address
-	}
-
-	pub fn timestamp(&self) -> &str {
-		&self.timestamp
-	}
+	pub address:   String,
+	pub timestamp: String,
 }
 
 impl FromStr for Begin {
@@ -65,18 +55,8 @@ impl FromStr for Begin {
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Header {
-	key:   String,
-	value: String,
-}
-
-impl Header {
-	pub fn key(&self) -> &str {
-		&self.key
-	}
-
-	pub fn value(&self) -> &str {
-		&self.value
-	}
+	pub key:   String,
+	pub value: String,
 }
 
 impl FromStr for Header {
@@ -88,7 +68,7 @@ impl FromStr for Header {
 		if let Some(key) = parts.next() {
 			if let Some(value) = parts.next() {
 				return Ok(Header {
-					key: key.trim().into(),
+					key:   key.trim().into(),
 					value: value.trim().replace("\t", " "),
 				});
 			}
@@ -105,9 +85,9 @@ mod test {
 
 	#[test]
 	fn begin_ok() {
-		let v = Begin::from_str("From foo@example.com 2016-08-27 17:10:19").unwrap();
-		assert_eq!(v.address(), "foo@example.com");
-		assert_eq!(v.timestamp(), "2016-08-27 17:10:19");
+		let v = Begin::from_str("From foo@example.com Wed Nov 17 14:35:53 2010").unwrap();
+		assert_eq!(v.address, "foo@example.com");
+		assert_eq!(v.timestamp, "Wed Nov 17 14:35:53 2010");
 	}
 
 	#[test]
@@ -118,8 +98,8 @@ mod test {
 	#[test]
 	fn header_ok() {
 		let v = Header::from_str("From: meh. <meh@schizofreni.co>").unwrap();
-		assert_eq!(v.key(), "From");
-		assert_eq!(v.value(), "meh. <meh@schizofreni.co>");
+		assert_eq!(v.key, "From");
+		assert_eq!(v.value, "meh. <meh@schizofreni.co>");
 	}
 
 	#[test]
