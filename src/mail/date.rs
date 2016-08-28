@@ -14,6 +14,7 @@
 
 use std::io;
 use std::str::FromStr;
+use std::ops::Deref;
 use chrono::{DateTime, FixedOffset};
 
 #[derive(Eq, PartialEq, Clone, Debug)]
@@ -26,5 +27,13 @@ impl FromStr for Date {
 		DateTime::parse_from_rfc2822(s)
 			.map(|v| Date(v))
 			.map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid date"))
+	}
+}
+
+impl Deref for Date {
+	type Target = DateTime<FixedOffset>;
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
 	}
 }
