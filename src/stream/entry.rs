@@ -20,7 +20,7 @@ pub enum Entry {
 	Begin(Begin),
 	Escape(String),
 	Header(Header),
-	Content(Vec<u8>),
+	Body(Vec<u8>),
 	End,
 }
 

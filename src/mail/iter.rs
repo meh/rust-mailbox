@@ -63,7 +63,7 @@ impl<R: Read> Iterator for Iter<R> {
 		};
 
 		let mut headers = Headers::new();
-		let mut content = Vec::new();
+		let mut body    = Vec::new();
 		let mut ended   = false;
 
 		// Read headers.
@@ -85,8 +85,11 @@ impl<R: Read> Iterator for Iter<R> {
 					}
 				}
 
-				Entry::Content(value) => {
-					content.push(value);
+				Entry::Body(value) => {
+					if self.body {
+						body.push(value);
+					}
+
 					break;
 				}
 
@@ -97,13 +100,15 @@ impl<R: Read> Iterator for Iter<R> {
 			}
 		}
 
-		// Read content unless there is none.
+		// Read body unless there is none.
 		if !ended {
-			while let Entry::Content(value) = try!(eof!(self.input.next())) {
-				content.push(value);
+			while let Entry::Body(value) = try!(eof!(self.input.next())) {
+				if self.body {
+					body.push(value);
+				}
 			}
 		}
 
-		Some(Ok(Mail::new(origin, headers, content)))
+		Some(Ok(Mail::new(origin, headers, body)))
 	}
 }

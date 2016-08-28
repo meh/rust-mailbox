@@ -19,15 +19,15 @@ use super::Headers;
 pub struct Mail {
 	origin:  stream::entry::Begin,
 	headers: Headers,
-	content: Vec<Vec<u8>>,
+	body:    Vec<Vec<u8>>,
 }
 
 impl Mail {
-	pub fn new(origin: stream::entry::Begin, headers: Headers, content: Vec<Vec<u8>>) -> Self {
+	pub fn new(origin: stream::entry::Begin, headers: Headers, body: Vec<Vec<u8>>) -> Self {
 		Mail {
 			origin:  origin,
 			headers: headers,
-			content: content,
+			body:    body,
 		}
 	}
 
@@ -39,7 +39,7 @@ impl Mail {
 		&self.headers
 	}
 
-	pub fn content(&self) -> &Vec<Vec<u8>> {
-		&self.content
+	pub fn body(&self) -> &Vec<Vec<u8>> {
+		&self.body
 	}
 }

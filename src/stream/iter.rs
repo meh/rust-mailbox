@@ -58,7 +58,7 @@ impl<R: BufRead> Iterator for Lines<R> {
 enum State {
 	Begin,
 	Header,
-	Content,
+	Body,
 }
 
 impl<R: Read> Iter<R> {
@@ -81,7 +81,7 @@ impl<R: Read> Iterator for Iter<R> {
 					value
 				}
 				else {
-					if self.state == State::Content {
+					if self.state == State::Body {
 						self.state = State::Begin;
 						return Some(Ok(Entry::End));
 					}
@@ -138,7 +138,7 @@ impl<R: Read> Iterator for Iter<R> {
 
 					// If the line is empty the header section is over.
 					if line.is_empty() {
-						self.state = State::Content;
+						self.state = State::Body;
 						continue;
 					}
 
@@ -164,7 +164,7 @@ impl<R: Read> Iterator for Iter<R> {
 					return Some(Ok(Entry::Header(try!(entry::Header::from_str(&line)))));
 				}
 
-				State::Content => {
+				State::Body => {
 					if line.is_empty() {
 						self.cache = Some(try!(eof!(self.input.next())));
 
@@ -177,10 +177,10 @@ impl<R: Read> Iterator for Iter<R> {
 							}
 						}
 
-						return Some(Ok(Entry::Content("".into())));
+						return Some(Ok(Entry::Body("".into())));
 					}
 					else {
-						return Some(Ok(Entry::Content(line)));
+						return Some(Ok(Entry::Body(line)));
 					}
 				}
 			}
