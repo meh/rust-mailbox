@@ -69,7 +69,7 @@ impl FromStr for Header {
 			if let Some(value) = parts.next() {
 				return Ok(Header {
 					key:   key.trim().into(),
-					value: value.trim().replace("\t", " "),
+					value: value.trim().into(),
 				});
 			}
 		}
