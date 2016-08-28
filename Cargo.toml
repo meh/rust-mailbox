@@ -13,6 +13,7 @@ keywords    = ["mail", "mbox"]
 lazy_static = "0.1"
 bitflags    = "0.7"
 
+case   = "0.0.1"
 regex  = "0.1"
 chrono = "0.2"
 mime   = "0.2"
