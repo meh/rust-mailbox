@@ -75,12 +75,20 @@ impl Begin {
 		self.inner
 	}
 
+	pub fn address_range(&self) -> Range<usize> {
+		Range { start: self.address.start, end: self.address.end }
+	}
+
 	pub fn address(&self) -> &str {
-		&self.inner[Range { start: self.address.start, end: self.address.end }]
+		&self.inner[self.address_range()]
+	}
+
+	pub fn timestamp_range(&self) -> Range<usize> {
+		Range { start: self.timestamp.start, end: self.timestamp.end }
 	}
 
 	pub fn timestamp(&self) -> &str {
-		&self.inner[Range { start: self.timestamp.start, end: self.timestamp.end }]
+		&self.inner[self.timestamp_range()]
 	}
 }
 
@@ -133,12 +141,20 @@ impl Header {
 		self.inner
 	}
 
+	pub fn key_range(&self) -> Range<usize> {
+		Range { start: self.key.start, end: self.key.end }
+	}
+
 	pub fn key(&self) -> &str {
-		&self.inner[Range { start: self.key.start, end: self.key.end }]
+		&self.inner[self.key_range()]
+	}
+
+	pub fn value_range(&self) -> Range<usize> {
+		Range { start: self.value.start, end: self.value.end }
 	}
 
 	pub fn value(&self) -> &str {
-		&self.inner[Range { start: self.value.start, end: self.value.end }]
+		&self.inner[self.value_range()]
 	}
 }
 
