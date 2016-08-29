@@ -85,8 +85,8 @@ impl<R: Read> Iterator for Iter<R> {
 				Entry::Escape(_) => (),
 
 				// TODO(meh): handle multiple headers with same name
-				Entry::Header(stream::entry::Header { key, value }) => {
-					headers.insert(key, value);
+				Entry::Header(header) => {
+					headers.insert(header);
 				}
 
 				Entry::Body(value) => {

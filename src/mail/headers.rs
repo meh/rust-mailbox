@@ -15,9 +15,10 @@
 use std::collections::{hash_map, HashMap};
 use case::CaseExt;
 use super::Header;
+use stream::entry;
 
 #[derive(Clone, Debug)]
-pub struct Headers(HashMap<String, Vec<String>>);
+pub struct Headers(HashMap<String, Vec<entry::Header>>);
 
 impl Headers {
 	#[inline]
@@ -27,16 +28,18 @@ impl Headers {
 
 	#[inline]
 	#[doc(hidden)]
-	pub fn insert<T: AsRef<str>>(&mut self, key: T, value: String) {
-		self.0.entry(key.as_ref().to_camel()).or_insert(Vec::new()).push(value);
+	pub fn insert(&mut self, value: entry::Header) {
+		let key = value.key().to_camel();
+
+		self.0.entry(key).or_insert(Vec::new()).push(value);
 	}
 
 	#[inline]
-	pub fn get<T: AsRef<str>>(&self, key: T) -> Option<Result<Header, &[String]>> {
+	pub fn get<T: AsRef<str>>(&self, key: T) -> Option<Result<Header, Vec<&str>>> {
 		let key = key.as_ref().to_camel();
 
 		if let Some(slice) = self.0.get(&key) {
-			Some(Header::parse(&key, slice).map_err(|_| slice.as_ref()))
+			Some(Header::parse(&key, slice).map_err(|_| slice.iter().map(|v| v.value()).collect()))
 		}
 		else {
 			None
@@ -59,7 +62,7 @@ impl Headers {
 	}
 
 	#[inline]
-	pub fn keys(&self) -> hash_map::Keys<String, Vec<String>> {
+	pub fn keys(&self) -> hash_map::Keys<String, Vec<entry::Header>> {
 		self.0.keys()
 	}
 
@@ -70,7 +73,7 @@ impl Headers {
 }
 
 impl<'a> IntoIterator for &'a Headers {
-	type Item     = (&'a str, Result<Header, &'a [String]>);
+	type Item     = (&'a str, Result<Header, Vec<&'a str>>);
 	type IntoIter = Iter<'a>;
 
 	#[inline]
@@ -79,15 +82,15 @@ impl<'a> IntoIterator for &'a Headers {
 	}
 }
 
-pub struct Iter<'a>(hash_map::Iter<'a, String, Vec<String>>);
+pub struct Iter<'a>(hash_map::Iter<'a, String, Vec<entry::Header>>);
 
 impl<'a> Iterator for Iter<'a> {
-	type Item = (&'a str, Result<Header, &'a [String]>);
+	type Item = (&'a str, Result<Header, Vec<&'a str>>);
 
 	#[inline]
 	fn next(&mut self) -> Option<Self::Item> {
 		if let Some((key, slice)) = self.0.next() {
-			Some((key, Header::parse(key, slice).map_err(|_| slice.as_ref())))
+			Some((key, Header::parse(key, slice).map_err(|_| slice.iter().map(|v| v.value()).collect())))
 		}
 		else {
 			None

@@ -13,7 +13,7 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io::{self, BufRead, BufReader, Read};
-use std::str::{self, FromStr};
+use std::str;
 use super::{entry, Entry};
 
 pub struct Iter<R: Read> {
@@ -128,7 +128,7 @@ impl<R: Read> Iterator for Iter<R> {
 			match self.state {
 				State::Begin => {
 					// Parse the beginning and return any errors.
-					let value  = try!(entry::Begin::from_str(utf8!(str::from_utf8(&line))));
+					let value  = try!(entry::Begin::new(utf8!(String::from_utf8(line))));
 					self.state = State::Header;
 
 					return Some(Ok(Entry::Begin(value)));
@@ -162,7 +162,7 @@ impl<R: Read> Iterator for Iter<R> {
 					}
 
 					// Parse the header and return any errors.
-					return Some(Ok(Entry::Header(try!(entry::Header::from_str(&line)))));
+					return Some(Ok(Entry::Header(try!(entry::Header::new(line)))));
 				}
 
 				State::Body => {
@@ -171,7 +171,7 @@ impl<R: Read> Iterator for Iter<R> {
 
 						if self.cache.as_ref().unwrap().starts_with(b"From ") {
 							if let Ok(string) = str::from_utf8(self.cache.as_ref().unwrap()) {
-								if entry::Begin::from_str(string).is_ok() {
+								if entry::Begin::ranges(string).is_ok() {
 									self.state = State::Begin;
 									return Some(Ok(Entry::End));
 								}
@@ -203,8 +203,8 @@ mod test {
 
 		{
 			if let Entry::Begin(item) = iter.next().unwrap().unwrap() {
-				assert_eq!(item.address, "meh@schizofreni.co");
-				assert_eq!(item.timestamp, "Wed Nov 17 14:35:53 2010");
+				assert_eq!(item.address(), "meh@schizofreni.co");
+				assert_eq!(item.timestamp(), "Wed Nov 17 14:35:53 2010");
 			}
 			else {
 				assert!(false);
@@ -213,8 +213,8 @@ mod test {
 
 		{
 			if let Entry::Header(item) = iter.next().unwrap().unwrap() {
-				assert_eq!(item.key, "Subject");
-				assert_eq!(item.value, "I like trains");
+				assert_eq!(item.key(), "Subject");
+				assert_eq!(item.value(), "I like trains");
 			}
 			else {
 				assert!(false);
@@ -223,8 +223,8 @@ mod test {
 
 		{
 			if let Entry::Header(item) = iter.next().unwrap().unwrap() {
-				assert_eq!(item.key, "Foo");
-				assert_eq!(item.value, "bar baz");
+				assert_eq!(item.key(), "Foo");
+				assert_eq!(item.value(), "bar baz");
 			}
 			else {
 				assert!(false);
