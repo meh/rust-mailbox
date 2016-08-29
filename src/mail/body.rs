@@ -18,21 +18,28 @@ use std::slice;
 pub struct Body(Vec<Vec<u8>>);
 
 impl Body {
+	#[doc(hidden)]
 	#[inline]
 	pub fn new() -> Self {
 		Body(Vec::new())
 	}
 
+	#[doc(hidden)]
 	#[inline]
 	pub fn append(&mut self, data: Vec<u8>) {
 		self.0.push(data);
 	}
 
+	pub fn len(&self) -> usize {
+		self.0.iter().map(|v| v.len()).sum::<usize>() + self.0.len() * 2
+	}
+
 	#[inline]
 	pub fn iter(&self) -> Iter {
 		Iter {
-			parent: self.0.iter(),
-			child:  None,
+			parent:    self.0.iter(),
+			child:     None,
+			separator: Separator::None,
 		}
 	}
 }
@@ -48,8 +55,16 @@ impl<'a> IntoIterator for &'a Body {
 }
 
 pub struct Iter<'a> {
-	parent: slice::Iter<'a, Vec<u8>>,
-	child:  Option<slice::Iter<'a, u8>>,
+	parent:    slice::Iter<'a, Vec<u8>>,
+	child:     Option<slice::Iter<'a, u8>>,
+	separator: Separator,
+}
+
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
+enum Separator {
+	CarriageReturn,
+	LineFeed,
+	None,
 }
 
 impl<'a> Iterator for Iter<'a> {
@@ -57,19 +72,34 @@ impl<'a> Iterator for Iter<'a> {
 
 	fn next(&mut self) -> Option<Self::Item> {
 		loop {
-			if self.child.is_some() {
-				if let Some(&byte) = self.child.as_mut().unwrap().next() {
-					return Some(byte);
+			match self.separator {
+				Separator::CarriageReturn => {
+					self.separator = Separator::LineFeed;
+					return Some(b'\r');
 				}
-				else {
-					self.child = None;
-				}
-			}
-			else {
-				self.child = self.parent.next().map(|v| v.iter());
 
-				if self.child.is_none() {
-					return None;
+				Separator::LineFeed => {
+					self.separator = Separator::None;
+					return Some(b'\n');
+				}
+
+				Separator::None => {
+					if self.child.is_some() {
+						if let Some(&byte) = self.child.as_mut().unwrap().next() {
+							return Some(byte);
+						}
+						else {
+							self.child     = None;
+							self.separator = Separator::CarriageReturn;
+						}
+					}
+					else {
+						self.child = self.parent.next().map(|v| v.iter());
+
+						if self.child.is_none() {
+							return None;
+						}
+					}
 				}
 			}
 		}
@@ -81,12 +111,22 @@ mod test {
 	use super::*;
 
 	#[test]
-	fn slice() {
+	fn len() {
 		let mut body = Body::new();
 		body.append(vec![1, 2, 3]);
 		body.append(vec![4]);
 		body.append(vec![5, 6]);
 
-		assert_eq!(body.iter().collect::<Vec<u8>>(), vec![1, 2, 3, 4, 5, 6]);
+		assert_eq!(body.len(), 12);
+	}
+
+	#[test]
+	fn iter() {
+		let mut body = Body::new();
+		body.append(vec![1, 2, 3]);
+		body.append(vec![4]);
+		body.append(vec![5, 6]);
+
+		assert_eq!(body.iter().collect::<Vec<u8>>(), vec![1, 2, 3, b'\r', b'\n', 4, b'\r', b'\n', 5, 6, b'\r', b'\n']);
 	}
 }
