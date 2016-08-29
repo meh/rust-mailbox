@@ -12,21 +12,81 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use std::slice;
+
 #[derive(PartialEq, Eq, Clone, Debug)]
-pub struct Body {
-	data: Vec<Vec<u8>>,
-}
+pub struct Body(Vec<Vec<u8>>);
 
 impl Body {
 	#[inline]
 	pub fn new() -> Self {
-		Body {
-			data: Vec::new(),
-		}
+		Body(Vec::new())
 	}
 
 	#[inline]
 	pub fn append(&mut self, data: Vec<u8>) {
-		self.data.push(data);
+		self.0.push(data);
+	}
+
+	#[inline]
+	pub fn iter(&self) -> Iter {
+		Iter {
+			parent: self.0.iter(),
+			child:  None,
+		}
+	}
+}
+
+impl<'a> IntoIterator for &'a Body {
+	type Item     = u8;
+	type IntoIter = Iter<'a>;
+
+	#[inline]
+	fn into_iter(self) -> Iter<'a> {
+		self.iter()
+	}
+}
+
+pub struct Iter<'a> {
+	parent: slice::Iter<'a, Vec<u8>>,
+	child:  Option<slice::Iter<'a, u8>>,
+}
+
+impl<'a> Iterator for Iter<'a> {
+	type Item = u8;
+
+	fn next(&mut self) -> Option<Self::Item> {
+		loop {
+			if self.child.is_some() {
+				if let Some(&byte) = self.child.as_mut().unwrap().next() {
+					return Some(byte);
+				}
+				else {
+					self.child = None;
+				}
+			}
+			else {
+				self.child = self.parent.next().map(|v| v.iter());
+
+				if self.child.is_none() {
+					return None;
+				}
+			}
+		}
+	}
+}
+
+#[cfg(test)]
+mod test {
+	use super::*;
+
+	#[test]
+	fn slice() {
+		let mut body = Body::new();
+		body.append(vec![1, 2, 3]);
+		body.append(vec![4]);
+		body.append(vec![5, 6]);
+
+		assert_eq!(body.iter().collect::<Vec<u8>>(), vec![1, 2, 3, 4, 5, 6]);
 	}
 }
