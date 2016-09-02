@@ -14,11 +14,11 @@
 
 use std::io::{self, BufRead, BufReader, Read};
 use std::str;
+use std::iter::Peekable;
 use super::{entry, Entry};
 
 pub struct Iter<R: Read> {
-	input: Lines<BufReader<R>>,
-	cache: Option<Vec<u8>>,
+	input: Peekable<Lines<BufReader<R>>>,
 	state: State,
 }
 
@@ -65,8 +65,7 @@ impl<R: Read> Iter<R> {
 	#[inline]
 	pub fn new(input: R) -> Self {
 		Iter {
-			input: Lines(BufReader::new(input)),
-			cache: None,
+			input: Lines(BufReader::new(input)).peekable(),
 			state: State::Begin,
 		}
 	}
@@ -117,13 +116,7 @@ impl<R: Read> Iterator for Iter<R> {
 		}
 
 		loop {
-			// Fetch a new line or use the cached line.
-			let line = if let Some(cache) = self.cache.take() {
-				cache
-			}
-			else {
-				try!(eof!(self.input.next()))
-			};
+			let line = try!(eof!(self.input.next()));
 
 			match self.state {
 				State::Begin => {
@@ -144,20 +137,30 @@ impl<R: Read> Iterator for Iter<R> {
 					}
 
 					// There's an escaped line after the beginning.
-					if line.starts_with(">") {
+					if line.starts_with('>') {
 						return Some(Ok(Entry::Escape((&line[1..]).into())));
 					}
 
 					// Read lines until there are no folded headers.
 					loop {
-						let current = try!(eof!(self.input.next()));
+						let consumed;
 
-						if current.first() == Some(&b' ') || current.first() == Some(&b'\t') {
-							line.push_str(utf8!(str::from_utf8(&current)));
+						if let Ok(ref current) = *eof!(self.input.peek()) {
+							match current.first() {
+								Some(&b' ') | Some(&b'\t') => {
+									line.push_str(utf8!(str::from_utf8(&current)));
+									consumed = true;
+								}
+
+								_ => break
+							}
 						}
 						else {
-							self.cache = Some(current);
 							break;
+						}
+
+						if consumed {
+							self.input.next();
 						}
 					}
 
@@ -167,18 +170,18 @@ impl<R: Read> Iterator for Iter<R> {
 
 				State::Body => {
 					if line.is_empty() {
-						self.cache = Some(try!(eof!(self.input.next())));
-
-						if self.cache.as_ref().unwrap().starts_with(b"From ") {
-							if let Ok(string) = str::from_utf8(self.cache.as_ref().unwrap()) {
-								if entry::Begin::ranges(string).is_ok() {
-									self.state = State::Begin;
-									return Some(Ok(Entry::End));
+						if let Ok(ref current) = *eof!(self.input.peek()) {
+							if current.starts_with(b"From ") {
+								if let Ok(string) = str::from_utf8(current) {
+									if entry::Begin::ranges(string).is_ok() {
+										self.state = State::Begin;
+										return Some(Ok(Entry::End));
+									}
 								}
 							}
 						}
 
-						return Some(Ok(Entry::Body("".into())));
+						return Some(Ok(Entry::Body(vec![])));
 					}
 					else {
 						return Some(Ok(Entry::Body(line)));
@@ -213,7 +216,7 @@ mod test {
 
 		{
 			if let Entry::Header(item) = iter.next().unwrap().unwrap() {
-				assert_eq!(item.key(), "Subject");
+				assert_eq!(&*item.key(), "Subject");
 				assert_eq!(item.value(), "I like trains");
 			}
 			else {
@@ -223,7 +226,7 @@ mod test {
 
 		{
 			if let Entry::Header(item) = iter.next().unwrap().unwrap() {
-				assert_eq!(item.key(), "Foo");
+				assert_eq!(&*item.key(), "Foo");
 				assert_eq!(item.value(), "bar baz");
 			}
 			else {
