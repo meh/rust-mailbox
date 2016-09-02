@@ -71,7 +71,7 @@ impl<R: Read> Iterator for Iter<R> {
 			return Some(Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid state")));
 		};
 
-		let mut headers = Headers::new();
+		let mut headers = Headers::default();
 		let mut body    = Body::default();
 		let mut ended   = false;
 
@@ -84,7 +84,6 @@ impl<R: Read> Iterator for Iter<R> {
 
 				Entry::Escape(_) => (),
 
-				// TODO(meh): handle multiple headers with same name
 				Entry::Header(header) => {
 					headers.insert(header);
 				}

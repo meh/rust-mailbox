@@ -17,15 +17,10 @@ use case::CaseExt;
 use super::Header;
 use stream::entry;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Default, Debug)]
 pub struct Headers(HashMap<String, Vec<entry::Header>>);
 
 impl Headers {
-	#[inline]
-	pub fn new() -> Self {
-		Headers(HashMap::new())
-	}
-
 	#[inline]
 	#[doc(hidden)]
 	pub fn insert(&mut self, value: entry::Header) {
