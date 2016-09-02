@@ -72,7 +72,7 @@ impl<R: Read> Iterator for Iter<R> {
 		};
 
 		let mut headers = Headers::new();
-		let mut body    = Body::new();
+		let mut body    = Body::default();
 		let mut ended   = false;
 
 		// Read headers.

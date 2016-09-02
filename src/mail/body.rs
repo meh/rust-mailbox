@@ -14,24 +14,24 @@
 
 use std::slice;
 
-#[derive(PartialEq, Eq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Default, Debug)]
 pub struct Body(Vec<Vec<u8>>);
 
 impl Body {
-	#[doc(hidden)]
-	#[inline]
-	pub fn new() -> Self {
-		Body(Vec::new())
-	}
-
 	#[doc(hidden)]
 	#[inline]
 	pub fn append(&mut self, data: Vec<u8>) {
 		self.0.push(data);
 	}
 
+	#[inline]
 	pub fn len(&self) -> usize {
 		self.0.iter().map(|v| v.len()).sum::<usize>() + self.0.len() * 2
+	}
+
+	#[inline]
+	pub fn is_empty(&self) -> bool {
+		self.0.is_empty()
 	}
 
 	#[inline]
@@ -112,7 +112,7 @@ mod test {
 
 	#[test]
 	fn len() {
-		let mut body = Body::new();
+		let mut body = Body::default();
 		body.append(vec![1, 2, 3]);
 		body.append(vec![4]);
 		body.append(vec![5, 6]);
@@ -122,7 +122,7 @@ mod test {
 
 	#[test]
 	fn iter() {
-		let mut body = Body::new();
+		let mut body = Body::default();
 		body.append(vec![1, 2, 3]);
 		body.append(vec![4]);
 		body.append(vec![5, 6]);
