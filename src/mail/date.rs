@@ -25,7 +25,7 @@ impl FromStr for Date {
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		DateTime::parse_from_rfc2822(s)
-			.map(|v| Date(v))
+			.map(Date)
 			.map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid date"))
 	}
 }
