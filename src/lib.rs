@@ -14,17 +14,18 @@
 
 #[macro_use]
 extern crate lazy_static;
-
 #[macro_use]
 extern crate bitflags;
+extern crate owning_ref;
 
-extern crate case;
+#[macro_use]
+extern crate nom;
+extern crate casing;
 extern crate regex;
 extern crate chrono;
 extern crate mime;
 
 pub mod stream;
-
 pub mod mail;
 pub use mail::Mail;
 

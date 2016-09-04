@@ -13,28 +13,26 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::collections::{hash_map, HashMap};
-use case::CaseExt;
+use casing::Casing;
 use super::Header;
 use stream::entry;
 
 #[derive(Clone, Default, Debug)]
-pub struct Headers(HashMap<String, Vec<entry::Header>>);
+pub struct Headers(HashMap<entry::header::Key, Vec<entry::Header>>);
 
 impl Headers {
 	#[inline]
 	#[doc(hidden)]
 	pub fn insert(&mut self, value: entry::Header) {
-		let key = value.key().to_camel();
-
-		self.0.entry(key).or_insert(Vec::new()).push(value);
+		self.0.entry(value.key()).or_insert_with(Vec::new).push(value);
 	}
 
 	#[inline]
 	pub fn get<T: AsRef<str>>(&self, key: T) -> Option<Result<Header, Vec<&str>>> {
-		let key = key.as_ref().to_camel();
+		let key = key.as_ref().header(Default::default());
 
-		if let Some(slice) = self.0.get(&key) {
-			Some(Header::parse(&key, slice).map_err(|_| slice.iter().map(|v| v.value()).collect()))
+		if let Some(slice) = self.0.get(key.as_ref()) {
+			Some(Header::parse(key.as_ref(), slice).map_err(|_| slice.iter().map(|v| v.value()).collect()))
 		}
 		else {
 			None
@@ -53,11 +51,11 @@ impl Headers {
 
 	#[inline]
 	pub fn contains_key<T: AsRef<str>>(&self, key: T) -> bool {
-		self.0.contains_key(&key.as_ref().to_camel())
+		self.0.contains_key(key.as_ref().header(Default::default()).as_ref())
 	}
 
 	#[inline]
-	pub fn keys(&self) -> hash_map::Keys<String, Vec<entry::Header>> {
+	pub fn keys(&self) -> hash_map::Keys<entry::header::Key, Vec<entry::Header>> {
 		self.0.keys()
 	}
 
@@ -77,7 +75,7 @@ impl<'a> IntoIterator for &'a Headers {
 	}
 }
 
-pub struct Iter<'a>(hash_map::Iter<'a, String, Vec<entry::Header>>);
+pub struct Iter<'a>(hash_map::Iter<'a, entry::header::Key, Vec<entry::Header>>);
 
 impl<'a> Iterator for Iter<'a> {
 	type Item = (&'a str, Result<Header, Vec<&'a str>>);
@@ -85,7 +83,7 @@ impl<'a> Iterator for Iter<'a> {
 	#[inline]
 	fn next(&mut self) -> Option<Self::Item> {
 		if let Some((key, slice)) = self.0.next() {
-			Some((key, Header::parse(key, slice).map_err(|_| slice.iter().map(|v| v.value()).collect())))
+			Some((key, Header::parse(key.as_ref(), slice).map_err(|_| slice.iter().map(|v| v.value()).collect())))
 		}
 		else {
 			None
