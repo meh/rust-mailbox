@@ -13,7 +13,6 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
-use std::str::FromStr;
 use std::net::IpAddr;
 use mime::Mime;
 use stream::entry;
@@ -40,22 +39,22 @@ impl Header {
 	pub fn parse<T: AsRef<str>>(key: T, entries: &[entry::Header]) -> io::Result<Self> {
 		Ok(match key.as_ref() {
 			"From" | "X-Envelope-From" =>
-				Header::From(try!(Address::from_str(entries[0].value()))),
+				Header::From(try!(Address::new(entries[0].value()))),
 
 			"To" | "Reply-To" | "Delivered-To" | "Return-Path" =>
-				Header::To(try!(Address::from_str(entries[0].value()))),
+				Header::To(try!(Address::new(entries[0].value()))),
 
 			"Cc" =>
-				Header::Cc(try!(entries[0].value().split(',').map(|v| Address::from_str(v)).collect())),
+				Header::Cc(try!(entries[0].value().split(',').map(|v| Address::parse(v)).collect())),
 
 			"Date" =>
-				Header::Date(try!(Date::from_str(entries[0].value()))),
+				Header::Date(try!(entries[0].value().parse())),
 
 			"Status" | "X-Status" =>
-				Header::Status(try!(Status::from_str(entries[0].value()))),
+				Header::Status(try!(entries[0].value().parse())),
 
 			"X-Remote-Addr" =>
-				Header::RemoteAddr(try!(IpAddr::from_str(entries[0].value()).map_err(|_|
+				Header::RemoteAddr(try!(entries[0].value().parse().map_err(|_|
 					io::Error::new(io::ErrorKind::InvalidInput, "invalid IP address")))),
 
 			"Content-Length" =>
@@ -63,7 +62,7 @@ impl Header {
 					io::Error::new(io::ErrorKind::InvalidInput, "invalid content length")))),
 
 			"Content-Type" =>
-				Header::ContentType(try!(Mime::from_str(entries[0].value()).map_err(|_|
+				Header::ContentType(try!(entries[0].value().parse().map_err(|_|
 					io::Error::new(io::ErrorKind::InvalidInput, "invalid MIME type")))),
 
 			"Lines" =>

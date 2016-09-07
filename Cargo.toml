@@ -16,6 +16,5 @@ owning_ref  = "0.2.1"
 
 nom    = "1.0"
 casing = "0.1"
-regex  = "0.1"
 chrono = "0.2"
 mime   = "0.2"
