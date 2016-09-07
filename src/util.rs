@@ -12,29 +12,9 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate bitflags;
-extern crate owning_ref;
+pub const WS: &'static [u8] = b" \t";
 
-#[macro_use]
-extern crate nom;
-extern crate casing;
-extern crate regex;
-extern crate chrono;
-extern crate mime;
-
-#[macro_use]
-mod util;
-
-pub mod stream;
-pub mod mail;
-pub use mail::Mail;
-
-use std::io::Read;
-
-#[inline]
-pub fn read<R: Read>(input: R) -> mail::Iter<R> {
-	mail::read(input)
+#[inline(always)]
+pub fn is_whitespace(c: u8) -> bool {
+	c == b' ' || c == b'\t'
 }

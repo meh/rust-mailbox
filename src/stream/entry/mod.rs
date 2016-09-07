@@ -27,13 +27,6 @@ pub use self::begin::Begin;
 pub mod header;
 pub use self::header::Header;
 
-const WS: &'static [u8] = b" \t";
-
-#[inline(always)]
-fn is_whitespace(c: u8) -> bool {
-	c == b' ' || c == b'\t'
-}
-
 #[cfg(test)]
 mod test {
 	use super::*;

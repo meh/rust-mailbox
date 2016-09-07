@@ -15,7 +15,7 @@
 use std::ops::Range;
 use std::io;
 use nom::{eof, IResult};
-use super::{WS, is_whitespace};
+use util::{WS, is_whitespace};
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Begin {
@@ -26,10 +26,11 @@ pub struct Begin {
 }
 
 impl Begin {
+	#[inline]
 	pub fn ranges<T: AsRef<str>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
 		let string = string.as_ref().as_bytes();
 
-		if let IResult::Done(_, (address, timestamp)) = extract(string) {
+		if let IResult::Done(_, (address, timestamp)) = parse(string) {
 			let a = address.as_ptr() as usize - string.as_ptr() as usize;
 			let t = timestamp.as_ptr() as usize - string.as_ptr() as usize;
 
@@ -42,6 +43,7 @@ impl Begin {
 		Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid beginning"))
 	}
 
+	#[inline]
 	pub fn new(string: String) -> io::Result<Self> {
 		let (address, timestamp) = try!(Begin::ranges(&string));
 
@@ -53,24 +55,28 @@ impl Begin {
 		})
 	}
 
+	#[inline]
 	pub fn address_range(&self) -> Range<usize> {
 		Range { start: self.address.start, end: self.address.end }
 	}
 
+	#[inline]
 	pub fn address(&self) -> &str {
 		&self.inner[self.address_range()]
 	}
 
+	#[inline]
 	pub fn timestamp_range(&self) -> Range<usize> {
 		Range { start: self.timestamp.start, end: self.timestamp.end }
 	}
 
+	#[inline]
 	pub fn timestamp(&self) -> &str {
 		&self.inner[self.timestamp_range()]
 	}
 }
 
-named!(extract(&[u8]) -> (&[u8], &[u8]),
+named!(parse(&[u8]) -> (&[u8], &[u8]),
 	chain!(
 		tag!("From ") ~
 		take_while!(is_whitespace) ~
