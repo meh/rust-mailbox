@@ -15,10 +15,10 @@
 use std::collections::{hash_map, HashMap};
 use casing::Casing;
 use super::Header;
-use stream::entry;
+use stream::entry::{self, header};
 
 #[derive(Clone, Default, Debug)]
-pub struct Headers(HashMap<entry::header::Key, Vec<entry::Header>>);
+pub struct Headers(HashMap<header::Item, Vec<entry::Header>>);
 
 impl Headers {
 	#[inline]
@@ -28,15 +28,17 @@ impl Headers {
 	}
 
 	#[inline]
-	pub fn get<T: AsRef<str>>(&self, key: T) -> Option<Result<Header, Vec<&str>>> {
+	pub fn get<T: AsRef<str>>(&self, key: T) -> Option<Result<Header, Vec<header::Item>>> {
 		let key = key.as_ref().header(Default::default());
 
-		if let Some(slice) = self.0.get(key.as_ref()) {
-			Some(Header::parse(key.as_ref(), slice).map_err(|_| slice.iter().map(|v| v.value()).collect()))
-		}
-		else {
-			None
-		}
+		self.0.get(key.as_ref()).map(|slice|
+			Header::parse(key.as_ref(), slice).map_err(|_| slice.iter().map(|h| h.value()).collect()))
+	}
+
+	#[inline]
+	pub fn raw<T: AsRef<str>>(&self, key: T) -> Option<Vec<header::Item>> {
+		self.0.get(key.as_ref().header(Default::default()).as_ref()).map(|slice|
+			slice.iter().map(|h| h.value()).collect())
 	}
 
 	#[inline]
@@ -55,7 +57,7 @@ impl Headers {
 	}
 
 	#[inline]
-	pub fn keys(&self) -> hash_map::Keys<entry::header::Key, Vec<entry::Header>> {
+	pub fn keys(&self) -> hash_map::Keys<header::Item, Vec<entry::Header>> {
 		self.0.keys()
 	}
 
@@ -66,7 +68,7 @@ impl Headers {
 }
 
 impl<'a> IntoIterator for &'a Headers {
-	type Item     = (&'a str, Result<Header, Vec<&'a str>>);
+	type Item     = (&'a str, Result<Header, Vec<header::Item>>);
 	type IntoIter = Iter<'a>;
 
 	#[inline]
@@ -75,15 +77,15 @@ impl<'a> IntoIterator for &'a Headers {
 	}
 }
 
-pub struct Iter<'a>(hash_map::Iter<'a, entry::header::Key, Vec<entry::Header>>);
+pub struct Iter<'a>(hash_map::Iter<'a, header::Item, Vec<entry::Header>>);
 
 impl<'a> Iterator for Iter<'a> {
-	type Item = (&'a str, Result<Header, Vec<&'a str>>);
+	type Item = (&'a str, Result<Header, Vec<header::Item>>);
 
 	#[inline]
 	fn next(&mut self) -> Option<Self::Item> {
 		if let Some((key, slice)) = self.0.next() {
-			Some((key, Header::parse(key.as_ref(), slice).map_err(|_| slice.iter().map(|v| v.value()).collect())))
+			Some((key, Header::parse(key.as_ref(), slice).map_err(|_| slice.iter().map(|h| h.value()).collect())))
 		}
 		else {
 			None

@@ -217,7 +217,7 @@ mod test {
 		{
 			if let Entry::Header(item) = iter.next().unwrap().unwrap() {
 				assert_eq!(&*item.key(), "Subject");
-				assert_eq!(item.value(), "I like trains");
+				assert_eq!(&*item.value(), "I like trains");
 			}
 			else {
 				assert!(false);
@@ -227,7 +227,7 @@ mod test {
 		{
 			if let Entry::Header(item) = iter.next().unwrap().unwrap() {
 				assert_eq!(&*item.key(), "Foo");
-				assert_eq!(item.value(), "bar baz");
+				assert_eq!(&*item.value(), "bar baz");
 			}
 			else {
 				assert!(false);

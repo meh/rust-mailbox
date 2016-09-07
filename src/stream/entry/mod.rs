@@ -47,7 +47,7 @@ mod test {
 	fn header_ok() {
 		let v = Header::new("From: meh. <meh@schizofreni.co>".into()).unwrap();
 		assert_eq!(&*v.key(), "From");
-		assert_eq!(v.value(), "meh. <meh@schizofreni.co>");
+		assert_eq!(&*v.value(), "meh. <meh@schizofreni.co>");
 	}
 
 	#[test]

@@ -23,63 +23,74 @@ use casing::Casing;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Header {
-	inner: Key,
+	inner: Item,
 
 	key:   Range<usize>,
 	value: Range<usize>,
 }
 
-pub type Key = OwningRef<Rc<String>, str>;
+pub type Item = OwningRef<Rc<String>, str>;
+
+pub fn item(string: String) -> Item {
+	OwningRef::new(Rc::new(string)).map(|s| s.as_ref())
+}
 
 impl Header {
+	#[inline]
 	pub fn ranges<T: AsRef<str>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
 		let string = string.as_ref().as_bytes();
 
-		if let IResult::Done(_, (key, value)) = extract(string) {
+		if let IResult::Done(_, (key, value)) = parse(string) {
 			let k = key.as_ptr() as usize - string.as_ptr() as usize;
 			let v = value.as_ptr() as usize - string.as_ptr() as usize;
 
-			return Ok((
+			Ok((
 				Range { start: k, end: k + key.len() },
 				Range { start: v, end: v + value.len() },
-			));
+			))
 		}
-
-		Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid header"))
+		else {
+			Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid header"))
+		}
 	}
 
+	#[inline]
 	pub fn new(string: String) -> io::Result<Self> {
 		let (key, value) = try!(Header::ranges(&string));
 
 		Ok(Header {
-			inner: OwningRef::new(Rc::new(string)).map(|s| s.as_ref()),
+			inner: item(string),
 
 			key:   key,
 			value: value,
 		})
 	}
 
+	#[inline]
 	pub fn key_range(&self) -> Range<usize> {
 		Range { start: self.key.start, end: self.key.end }
 	}
 
-	pub fn key(&self) -> Key {
+	#[inline]
+	pub fn key(&self) -> Item {
 		match (&self.inner[self.key_range()]).header(Default::default()) {
 			Cow::Borrowed(_)   => self.inner.clone().map(|s| &s[self.key_range()]),
 			Cow::Owned(string) => OwningRef::new(Rc::new(string)).map(|s| s.as_ref()),
 		}
 	}
 
+	#[inline]
 	pub fn value_range(&self) -> Range<usize> {
 		Range { start: self.value.start, end: self.value.end }
 	}
 
-	pub fn value(&self) -> &str {
-		&self.inner[self.value_range()]
+	#[inline]
+	pub fn value(&self) -> Item {
+		self.inner.clone().map(|s| &s[self.value_range()])
 	}
 }
 
-named!(extract(&[u8]) -> (&[u8], &[u8]),
+named!(parse(&[u8]) -> (&[u8], &[u8]),
 	chain!(
 		key: key ~
 		tag!(":") ~
@@ -99,7 +110,7 @@ mod test {
 	fn ok() {
 		let v = Header::new("From: meh. <meh@schizofreni.co>".into()).unwrap();
 		assert_eq!(&*v.key(), "From");
-		assert_eq!(v.value(), "meh. <meh@schizofreni.co>");
+		assert_eq!(&*v.value(), "meh. <meh@schizofreni.co>");
 	}
 
 	#[test]
