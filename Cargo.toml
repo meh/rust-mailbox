@@ -12,7 +12,7 @@ keywords    = ["mail", "mbox"]
 [dependencies]
 lazy_static = "0.1"
 bitflags    = "0.7"
-owning_ref  = { git = "https://github.com/meh/owning-ref-rs" }
+owning_ref  = "0.2.1"
 
 nom    = "1.0"
 casing = "0.1"
