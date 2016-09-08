@@ -12,21 +12,32 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-mod mail;
-pub use self::mail::Mail;
+use std::io;
+use std::ops::Deref;
+use stream::entry;
+use super::Header;
 
-mod headers;
-pub use self::headers::Headers;
+#[derive(Eq, PartialEq, Clone, Debug)]
+pub struct Lines(pub usize);
 
-mod body;
-pub use self::body::Body;
+impl Header for Lines {
+	#[inline]
+	fn name() -> &'static str {
+		"Lines"
+	}
 
-mod iter;
-pub use self::iter::Iter;
+	#[inline]
+	fn parse(entries: &[entry::Header]) -> io::Result<Self> {
+		Ok(Lines(try!(entries[0].value().parse().map_err(|_|
+			io::Error::new(io::ErrorKind::InvalidInput, "invalid lines")))))
+	}
+}
 
-use std::io::Read;
+impl Deref for Lines {
+	type Target = usize;
 
-#[inline]
-pub fn read<R: Read>(input: R) -> Iter<R> {
-	Iter::new(input)
+	#[inline]
+	fn deref(&self) -> &Self::Target {
+		&self.0
+	}
 }

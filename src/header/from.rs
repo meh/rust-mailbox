@@ -12,21 +12,32 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-mod mail;
-pub use self::mail::Mail;
+use std::io;
+use stream::entry;
+use util::Address;
+use super::Header;
 
-mod headers;
-pub use self::headers::Headers;
+pub struct From {
+	address: Address,
+}
 
-mod body;
-pub use self::body::Body;
+impl Header for From {
+	#[inline]
+	fn name() -> &'static str {
+		"From"
+	}
 
-mod iter;
-pub use self::iter::Iter;
+	#[inline]
+	fn parse(entries: &[entry::Header]) -> io::Result<Self> {
+		Ok(From {
+			address: try!(Address::new(entries[0].value()))
+		})
+	}
+}
 
-use std::io::Read;
-
-#[inline]
-pub fn read<R: Read>(input: R) -> Iter<R> {
-	Iter::new(input)
+impl From {
+	#[inline]
+	pub fn address(&self) -> &Address {
+		&self.address
+	}
 }

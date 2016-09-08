@@ -13,8 +13,9 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::collections::{hash_map, HashMap};
+use std::io;
 use casing::Casing;
-use super::Header;
+use header::Header;
 use stream::entry::{self, header};
 
 #[derive(Clone, Default, Debug)]
@@ -28,15 +29,19 @@ impl Headers {
 	}
 
 	#[inline]
-	pub fn get<T: AsRef<str>>(&self, key: T) -> Option<Result<Header, Vec<header::Item>>> {
-		let key = key.as_ref().header(Default::default());
-
-		self.0.get(key.as_ref()).map(|slice|
-			Header::parse(key.as_ref(), slice).map_err(|_| slice.iter().map(|h| h.value()).collect()))
+	pub fn get<H: Header>(&self) -> Option<io::Result<H>> {
+		self.0.get(H::name())
+			.map(|v| H::parse(v.as_ref()))
 	}
 
 	#[inline]
-	pub fn raw<T: AsRef<str>>(&self, key: T) -> Option<Vec<header::Item>> {
+	pub fn get_from<H: Header, T: AsRef<str>>(&self, key: T) -> Option<io::Result<H>> {
+		self.0.get(key.as_ref().header(Default::default()).as_ref())
+			.map(|v| H::parse(v.as_ref()))
+	}
+
+	#[inline]
+	pub fn get_raw<T: AsRef<str>>(&self, key: T) -> Option<Vec<header::Item>> {
 		self.0.get(key.as_ref().header(Default::default()).as_ref()).map(|slice|
 			slice.iter().map(|h| h.value()).collect())
 	}
@@ -57,6 +62,11 @@ impl Headers {
 	}
 
 	#[inline]
+	pub fn contains<H: Header>(&self) -> bool {
+		self.0.contains_key(H::name())
+	}
+
+	#[inline]
 	pub fn keys(&self) -> hash_map::Keys<header::Item, Vec<entry::Header>> {
 		self.0.keys()
 	}
@@ -67,8 +77,31 @@ impl Headers {
 	}
 }
 
+pub struct HeaderView<'a> {
+	key:   &'a header::Item,
+	value: &'a Vec<entry::Header>,
+}
+
+impl<'a> HeaderView<'a> {
+	pub fn is<H: Header>(&self) -> bool {
+		self.key.as_ref() == H::name()
+	}
+
+	pub fn name(&self) -> &str {
+		self.key.as_ref()
+	}
+
+	pub fn value<H: Header>(&self) -> io::Result<H> {
+		H::parse(self.value)
+	}
+
+	pub fn raw(&self) -> &[entry::Header] {
+		self.value
+	}
+}
+
 impl<'a> IntoIterator for &'a Headers {
-	type Item     = (&'a str, Result<Header, Vec<header::Item>>);
+	type Item     = HeaderView<'a>;
 	type IntoIter = Iter<'a>;
 
 	#[inline]
@@ -80,12 +113,15 @@ impl<'a> IntoIterator for &'a Headers {
 pub struct Iter<'a>(hash_map::Iter<'a, header::Item, Vec<entry::Header>>);
 
 impl<'a> Iterator for Iter<'a> {
-	type Item = (&'a str, Result<Header, Vec<header::Item>>);
+	type Item = HeaderView<'a>;
 
 	#[inline]
 	fn next(&mut self) -> Option<Self::Item> {
 		if let Some((key, slice)) = self.0.next() {
-			Some((key, Header::parse(key.as_ref(), slice).map_err(|_| slice.iter().map(|h| h.value()).collect())))
+			Some(HeaderView {
+				key:   key,
+				value: slice,
+			})
 		}
 		else {
 			None

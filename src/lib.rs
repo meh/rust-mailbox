@@ -28,6 +28,9 @@ extern crate mime;
 mod util;
 pub use util::Address;
 
+pub mod header;
+pub use header::Header;
+
 pub mod stream;
 
 pub mod mail;

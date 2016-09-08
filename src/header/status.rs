@@ -12,8 +12,9 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-use std::str::FromStr;
 use std::io;
+use stream::entry;
+use super::Header;
 
 bitflags! {
 	pub flags Status: u8 {
@@ -26,13 +27,17 @@ bitflags! {
 	}
 }
 
-impl FromStr for Status {
-	type Err = io::Error;
+impl Header for Status {
+	#[inline]
+	fn name() -> &'static str {
+		"Status"
+	}
 
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
+	#[inline]
+	fn parse(entries: &[entry::Header]) -> io::Result<Self> {
 		let mut status = Status::empty();
 
-		for ch in s.chars() {
+		for ch in entries[0].value().chars() {
 			status |= match ch {
 				'R' => SEEN,
 				'O' => OLD,
@@ -52,12 +57,11 @@ impl FromStr for Status {
 
 #[cfg(test)]
 mod test {
-	use std::str::FromStr;
 	use super::*;
 
 	#[test]
 	fn read() {
-		assert_eq!(Status::from_str("R").unwrap(), SEEN);
+		assert_eq!(<Status as Header>::from_str("R").unwrap(), SEEN);
 	}
 
 	#[test]

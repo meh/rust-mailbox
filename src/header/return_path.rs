@@ -13,27 +13,31 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
-use std::str::FromStr;
-use std::ops::Deref;
-use chrono::{DateTime, FixedOffset};
+use stream::entry;
+use util::Address;
+use super::Header;
 
-#[derive(Eq, PartialEq, Clone, Debug)]
-pub struct Date(DateTime<FixedOffset>);
+pub struct ReturnPath {
+	address: Address,
+}
 
-impl FromStr for Date {
-	type Err = io::Error;
+impl Header for ReturnPath {
+	#[inline]
+	fn name() -> &'static str {
+		"Return-Path"
+	}
 
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		DateTime::parse_from_rfc2822(s)
-			.map(Date)
-			.map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid date"))
+	#[inline]
+	fn parse(entries: &[entry::Header]) -> io::Result<Self> {
+		Ok(ReturnPath {
+			address: try!(Address::new(entries[0].value()))
+		})
 	}
 }
 
-impl Deref for Date {
-	type Target = DateTime<FixedOffset>;
-
-	fn deref(&self) -> &Self::Target {
-		&self.0
+impl ReturnPath {
+	#[inline]
+	pub fn address(&self) -> &Address {
+		&self.address
 	}
 }

@@ -1,5 +1,5 @@
 extern crate mailbox;
-use mailbox::mail;
+use mailbox::{mail, header};
 
 use std::fs::File;
 use std::env;
@@ -22,29 +22,29 @@ fn main() {
 		if let Ok(mail) = mail {
 			status.total += 1;
 
-			for field in vec![mail.headers().get("Status"), mail.headers().get("X-Status")] {
-				if let Some(Ok(mail::Header::Status(s))) = field {
-					if s.contains(mail::status::SEEN) {
+			for field in vec![mail.headers().get_from::<header::Status, _>("Status"), mail.headers().get_from::<header::Status, _>("X-Status")] {
+				if let Some(Ok(s)) = field {
+					if s.contains(header::status::SEEN) {
 						status.seen += 1;
 					}
 
-					if s.contains(mail::status::OLD) {
+					if s.contains(header::status::OLD) {
 						status.old += 1;
 					}
 
-					if s.contains(mail::status::ANSWERED) {
+					if s.contains(header::status::ANSWERED) {
 						status.answered += 1;
 					}
 
-					if s.contains(mail::status::FLAGGED) {
+					if s.contains(header::status::FLAGGED) {
 						status.flagged += 1;
 					}
 
-					if s.contains(mail::status::DRAFT) {
+					if s.contains(header::status::DRAFT) {
 						status.draft += 1;
 					}
 
-					if s.contains(mail::status::DELETED) {
+					if s.contains(header::status::DELETED) {
 						status.deleted += 1;
 					}
 				}
