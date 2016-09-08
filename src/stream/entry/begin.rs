@@ -15,7 +15,7 @@
 use std::ops::Range;
 use std::io;
 use nom::{eof, IResult};
-use util::{WS, is_whitespace};
+use util::parser::{WS, is_whitespace};
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Begin {

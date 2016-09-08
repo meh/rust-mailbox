@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::borrow::Cow;
 use owning_ref::OwningRef;
 use nom::{rest, IResult};
-use util::is_whitespace;
+use util::parser::is_whitespace;
 use casing::Casing;
 
 #[derive(Eq, PartialEq, Clone, Debug)]

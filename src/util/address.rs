@@ -17,7 +17,7 @@ use std::ops::Range;
 use std::io;
 use std::str;
 use nom::{eof, rest, IResult};
-use util::{is_whitespace};
+use util::parser::{is_whitespace};
 use stream::entry::header;
 
 #[derive(Eq, PartialEq, Clone, Debug)]

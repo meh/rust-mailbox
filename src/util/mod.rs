@@ -12,30 +12,7 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-mod mail;
-pub use self::mail::Mail;
+pub mod parser;
 
-mod headers;
-pub use self::headers::Headers;
-
-mod header;
-pub use self::header::Header;
-
-mod body;
-pub use self::body::Body;
-
-pub mod status;
-pub use self::status::Status;
-
-mod date;
-pub use self::date::Date;
-
-mod iter;
-pub use self::iter::Iter;
-
-use std::io::Read;
-
-#[inline]
-pub fn read<R: Read>(input: R) -> Iter<R> {
-	Iter::new(input)
-}
+mod address;
+pub use self::address::Address;

@@ -26,8 +26,10 @@ extern crate mime;
 
 #[macro_use]
 mod util;
+pub use util::Address;
 
 pub mod stream;
+
 pub mod mail;
 pub use mail::Mail;
 
