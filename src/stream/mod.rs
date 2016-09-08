@@ -15,6 +15,9 @@
 pub mod entry;
 pub use self::entry::Entry;
 
+mod lines;
+pub use self::lines::Lines;
+
 mod iter;
 pub use self::iter::Iter;
 

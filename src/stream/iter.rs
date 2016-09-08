@@ -12,46 +12,14 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-use std::io::{self, BufRead, BufReader, Read};
+use std::io::{self, BufReader, Read};
 use std::str;
 use std::iter::Peekable;
-use super::{entry, Entry};
+use super::{entry, Entry, Lines};
 
 pub struct Iter<R: Read> {
 	input: Peekable<Lines<BufReader<R>>>,
 	state: State,
-}
-
-pub struct Lines<R: BufRead>(R);
-
-impl<R: BufRead> Iterator for Lines<R> {
-	type Item = io::Result<Vec<u8>>;
-
-	fn next(&mut self) -> Option<Self::Item> {
-		let mut buffer = Vec::new();
-
-		match self.0.read_until(b'\n', &mut buffer) {
-			Ok(0) => {
-				None
-			}
-
-			Ok(_) => {
-				if buffer.last() == Some(&b'\n') {
-					buffer.pop();
-
-					if buffer.last() == Some(&b'\r') {
-						buffer.pop();
-					}
-				}
-
-				Some(Ok(buffer))
-			}
-
-			Err(e) => {
-				Some(Err(e))
-			}
-		}
-	}
 }
 
 #[derive(Eq, PartialEq, Copy, Clone, Debug)]
@@ -65,7 +33,7 @@ impl<R: Read> Iter<R> {
 	#[inline]
 	pub fn new(input: R) -> Self {
 		Iter {
-			input: Lines(BufReader::new(input)).peekable(),
+			input: Lines::new(BufReader::new(input)).peekable(),
 			state: State::Begin,
 		}
 	}
