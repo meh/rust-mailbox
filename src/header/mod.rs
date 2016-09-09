@@ -58,3 +58,6 @@ pub use self::lines::Lines;
 
 mod cc;
 pub use self::cc::Cc;
+
+mod bcc;
+pub use self::bcc::Bcc;
