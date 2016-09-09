@@ -122,8 +122,10 @@ impl fmt::Display for Address {
 }
 
 named!(parse(&[u8]) -> (Option<&str>, &str, Option<&str>),
-	dbg!(chain!(
+	chain!(
+		take_while!(is_whitespace) ~
 		name: opt!(complete!(name)) ~
+		take_while!(is_whitespace) ~
 		addr: address ~
 		eof,
 
@@ -143,17 +145,17 @@ named!(parse(&[u8]) -> (Option<&str>, &str, Option<&str>),
 			let host = addr.1.map(|s| str::from_utf8_unchecked(s));
 
 			(name, user, host)
-		})));
+		}));
 
 named!(name(&[u8]) -> &[u8],
 	alt!(name_quoted | name_bare));
 
 named!(name_quoted(&[u8]) -> &[u8],
-	dbg!(chain!(
+	chain!(
 		name: delimited!(char!('"'), is_not!("\""), char!('"')) ~
 		take_until!("<"),
 
-		|| { name })));
+		|| { name }));
 
 named!(name_bare(&[u8]) -> &[u8],
 	chain!(
