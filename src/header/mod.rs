@@ -61,3 +61,18 @@ pub use self::cc::Cc;
 
 mod bcc;
 pub use self::bcc::Bcc;
+
+mod sender;
+pub use self::sender::Sender;
+
+mod message_id;
+pub use self::message_id::MessageId;
+
+mod user_agent;
+pub use self::user_agent::UserAgent;
+
+mod subject;
+pub use self::subject::Subject;
+
+mod references;
+pub use self::references::References;
