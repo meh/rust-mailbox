@@ -20,34 +20,40 @@ fn main() {
 
 	for mail in mail::read(File::open(env::args().nth(1).expect("no file given")).unwrap()).body(false) {
 		if let Ok(mail) = mail {
+			let mut current = header::Status::empty();
+
+			if let Some(Ok(s)) = mail.headers().get::<header::Status>() {
+				current |= s;
+			}
+
+			if let Some(Ok(s)) = mail.headers().get_from::<header::Status, _>("X-Status") {
+				current |= s;
+			}
+
 			status.total += 1;
 
-			for field in vec![mail.headers().get_from::<header::Status, _>("Status"), mail.headers().get_from::<header::Status, _>("X-Status")] {
-				if let Some(Ok(s)) = field {
-					if s.contains(header::status::SEEN) {
-						status.seen += 1;
-					}
+			if current.contains(header::status::SEEN) {
+				status.seen += 1;
+			}
 
-					if s.contains(header::status::OLD) {
-						status.old += 1;
-					}
+			if current.contains(header::status::OLD) {
+				status.old += 1;
+			}
 
-					if s.contains(header::status::ANSWERED) {
-						status.answered += 1;
-					}
+			if current.contains(header::status::ANSWERED) {
+				status.answered += 1;
+			}
 
-					if s.contains(header::status::FLAGGED) {
-						status.flagged += 1;
-					}
+			if current.contains(header::status::FLAGGED) {
+				status.flagged += 1;
+			}
 
-					if s.contains(header::status::DRAFT) {
-						status.draft += 1;
-					}
+			if current.contains(header::status::DRAFT) {
+				status.draft += 1;
+			}
 
-					if s.contains(header::status::DELETED) {
-						status.deleted += 1;
-					}
-				}
+			if current.contains(header::status::DELETED) {
+				status.deleted += 1;
 			}
 		}
 	}
