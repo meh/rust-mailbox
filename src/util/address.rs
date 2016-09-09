@@ -50,7 +50,7 @@ impl Address {
 	}
 
 	pub fn parse<T: AsRef<str>>(string: T) -> io::Result<Self> {
-		Address::new(header::item(string.as_ref().into()))
+		Address::new(header::item(string.as_ref()))
 	}
 
 	pub fn new(string: header::Item) -> io::Result<Self> {
