@@ -192,8 +192,6 @@ named!(address_user_only(&[u8]) -> (&[u8], Option<&[u8]>),
 #[cfg(test)]
 mod test {
 	use super::*;
-	use stream::entry::header;
-	use std::rc::Rc;
 
 	#[test]
 	fn parse_name_bare() {

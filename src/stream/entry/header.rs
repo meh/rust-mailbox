@@ -110,13 +110,13 @@ mod test {
 
 	#[test]
 	fn ok() {
-		let v = Header::new("From: meh. <meh@schizofreni.co>".into()).unwrap();
+		let v = Header::new("From: meh. <meh@schizofreni.co>").unwrap();
 		assert_eq!(&*v.key(), "From");
 		assert_eq!(&*v.value(), "meh. <meh@schizofreni.co>");
 	}
 
 	#[test]
 	fn fail() {
-		assert!(Header::new("From foo@example.com".into()).is_err());
+		assert!(Header::new("From foo@example.com").is_err());
 	}
 }

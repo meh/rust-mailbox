@@ -100,13 +100,13 @@ mod test {
 
 	#[test]
 	fn ok() {
-		let v = Begin::new("From foo@example.com Wed Nov 17 14:35:53 2010".into()).unwrap();
+		let v = Begin::new("From foo@example.com Wed Nov 17 14:35:53 2010").unwrap();
 		assert_eq!(v.address(), "foo@example.com");
 		assert_eq!(v.timestamp(), "Wed Nov 17 14:35:53 2010");
 	}
 
 	#[test]
 	fn fail() {
-		assert!(Begin::new("From foo@example.com".into()).is_err());
+		assert!(Begin::new("From foo@example.com").is_err());
 	}
 }

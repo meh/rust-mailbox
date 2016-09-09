@@ -33,25 +33,25 @@ mod test {
 
 	#[test]
 	fn begin_ok() {
-		let v = Begin::new("From foo@example.com Wed Nov 17 14:35:53 2010".into()).unwrap();
+		let v = Begin::new("From foo@example.com Wed Nov 17 14:35:53 2010").unwrap();
 		assert_eq!(v.address(), "foo@example.com");
 		assert_eq!(v.timestamp(), "Wed Nov 17 14:35:53 2010");
 	}
 
 	#[test]
 	fn begin_fail() {
-		assert!(Begin::new("From foo@example.com".into()).is_err());
+		assert!(Begin::new("From foo@example.com").is_err());
 	}
 
 	#[test]
 	fn header_ok() {
-		let v = Header::new("From: meh. <meh@schizofreni.co>".into()).unwrap();
+		let v = Header::new("From: meh. <meh@schizofreni.co>").unwrap();
 		assert_eq!(&*v.key(), "From");
 		assert_eq!(&*v.value(), "meh. <meh@schizofreni.co>");
 	}
 
 	#[test]
 	fn header_fail() {
-		assert!(Header::new("From foo@example.com".into()).is_err());
+		assert!(Header::new("From foo@example.com").is_err());
 	}
 }
