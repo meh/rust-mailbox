@@ -58,45 +58,53 @@ impl Header for Status {
 #[cfg(test)]
 mod test {
 	use super::*;
+	use stream::entry::header;
+	use header::Header;
+
+	macro_rules! parse {
+		($str:expr) => (
+			<Status as Header>::parse(&[header::item($str)])
+		);
+	}
 
 	#[test]
 	fn read() {
-		assert_eq!(<Status as Header>::from_str("R").unwrap(), SEEN);
+		assert_eq!(parse!("R").unwrap(), SEEN);
 	}
 
 	#[test]
 	fn old() {
-		assert_eq!(Status::from_str("O").unwrap(), OLD);
+		assert_eq!(parse!("O").unwrap(), OLD);
 	}
 
 	#[test]
 	fn answered() {
-		assert_eq!(Status::from_str("A").unwrap(), ANSWERED);
+		assert_eq!(parse!("A").unwrap(), ANSWERED);
 	}
 
 	#[test]
 	fn flagged() {
-		assert_eq!(Status::from_str("F").unwrap(), FLAGGED);
+		assert_eq!(parse!("F").unwrap(), FLAGGED);
 	}
 
 	#[test]
 	fn draft() {
-		assert_eq!(Status::from_str("T").unwrap(), DRAFT);
+		assert_eq!(parse!("T").unwrap(), DRAFT);
 	}
 
 	#[test]
 	fn deleted() {
-		assert_eq!(Status::from_str("D").unwrap(), DELETED);
+		assert_eq!(parse!("D").unwrap(), DELETED);
 	}
 
 	#[test]
 	fn mixed() {
-		assert_eq!(Status::from_str("ROD").unwrap(), SEEN | OLD | DELETED);
-		assert_eq!(Status::from_str("FTA").unwrap(), FLAGGED | DRAFT | ANSWERED);
+		assert_eq!(parse!("ROD").unwrap(), SEEN | OLD | DELETED);
+		assert_eq!(parse!("FTA").unwrap(), FLAGGED | DRAFT | ANSWERED);
 	}
 
 	#[test]
 	fn fail() {
-		assert!(Status::from_str("ANTANI").is_err());
+		assert!(parse!("ANTANI").is_err());
 	}
 }
