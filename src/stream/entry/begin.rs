@@ -44,7 +44,8 @@ impl Begin {
 	}
 
 	#[inline]
-	pub fn new(string: String) -> io::Result<Self> {
+	pub fn new<T: Into<String>>(string: T) -> io::Result<Self> {
+		let string               = string.into();
 		let (address, timestamp) = try!(Begin::ranges(&string));
 
 		Ok(Begin {
