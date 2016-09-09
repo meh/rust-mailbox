@@ -13,13 +13,12 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
+use std::ops::Deref;
 use stream::entry::header;
 use util::Address;
 use super::Header;
 
-pub struct Sender {
-	address: Address,
-}
+pub struct Sender(Address);
 
 impl Header for Sender {
 	#[inline]
@@ -29,15 +28,14 @@ impl Header for Sender {
 
 	#[inline]
 	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(Sender {
-			address: try!(Address::new(values[0].clone()))
-		})
+		Ok(Sender(try!(Address::new(values[0].clone()))))
 	}
 }
 
-impl Sender {
-	#[inline]
-	pub fn address(&self) -> &Address {
-		&self.address
+impl Deref for Sender {
+	type Target = Address;
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
 	}
 }

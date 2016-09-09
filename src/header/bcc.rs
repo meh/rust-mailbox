@@ -13,13 +13,12 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
+use std::ops::Deref;
 use stream::entry::header;
 use util::Address;
 use super::Header;
 
-pub struct Bcc {
-	to: Vec<Address>,
-}
+pub struct Bcc(Vec<Address>);
 
 impl Header for Bcc {
 	#[inline]
@@ -39,15 +38,14 @@ impl Header for Bcc {
 			to.push(try!(Address::new(string.clone().map(|s| &s[start..end]))));
 		}
 
-		Ok(Bcc {
-			to: to,
-		})
+		Ok(Bcc(to))
 	}
 }
 
-impl Bcc {
-	#[inline]
-	pub fn to(&self) -> &[Address] {
-		&self.to
+impl Deref for Bcc {
+	type Target = [Address];
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
 	}
 }

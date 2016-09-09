@@ -13,13 +13,12 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
+use std::ops::Deref;
 use stream::entry::header;
 use util::Address;
 use super::Header;
 
-pub struct DeliveredTo {
-	address: Address,
-}
+pub struct DeliveredTo(Address);
 
 impl Header for DeliveredTo {
 	#[inline]
@@ -29,15 +28,14 @@ impl Header for DeliveredTo {
 
 	#[inline]
 	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(DeliveredTo {
-			address: try!(Address::new(values[0].clone()))
-		})
+		Ok(DeliveredTo(try!(Address::new(values[0].clone()))))
 	}
 }
 
-impl DeliveredTo {
-	#[inline]
-	pub fn address(&self) -> &Address {
-		&self.address
+impl Deref for DeliveredTo {
+	type Target = Address;
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
 	}
 }

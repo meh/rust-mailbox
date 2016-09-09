@@ -13,13 +13,12 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
+use std::ops::Deref;
 use stream::entry::header;
 use util::Address;
 use super::Header;
 
-pub struct Cc {
-	to: Vec<Address>,
-}
+pub struct Cc(Vec<Address>);
 
 impl Header for Cc {
 	#[inline]
@@ -39,15 +38,14 @@ impl Header for Cc {
 			to.push(try!(Address::new(string.clone().map(|s| &s[start..end]))));
 		}
 
-		Ok(Cc {
-			to: to,
-		})
+		Ok(Cc(to))
 	}
 }
 
-impl Cc {
-	#[inline]
-	pub fn to(&self) -> &[Address] {
-		&self.to
+impl Deref for Cc {
+	type Target = [Address];
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
 	}
 }

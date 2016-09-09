@@ -13,13 +13,12 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
+use std::ops::Deref;
 use stream::entry::header;
 use util::Address;
 use super::Header;
 
-pub struct XEnvelopeFrom {
-	address: Address,
-}
+pub struct XEnvelopeFrom(Address);
 
 impl Header for XEnvelopeFrom {
 	#[inline]
@@ -29,15 +28,14 @@ impl Header for XEnvelopeFrom {
 
 	#[inline]
 	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(XEnvelopeFrom {
-			address: try!(Address::new(values[0].clone()))
-		})
+		Ok(XEnvelopeFrom(try!(Address::new(values[0].clone()))))
 	}
 }
 
-impl XEnvelopeFrom {
-	#[inline]
-	pub fn address(&self) -> &Address {
-		&self.address
+impl Deref for XEnvelopeFrom {
+	type Target = Address;
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
 	}
 }

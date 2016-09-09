@@ -13,13 +13,12 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
+use std::ops::Deref;
 use stream::entry::header;
 use util::Address;
 use super::{Header, MessageId};
 
-pub struct References {
-	ids: Vec<MessageId>,
-}
+pub struct References(Vec<MessageId>);
 
 impl Header for References {
 	#[inline]
@@ -39,15 +38,14 @@ impl Header for References {
 			ids.push(MessageId(try!(Address::new(string.clone().map(|s| &s[start..end])))));
 		}
 
-		Ok(References {
-			ids: ids,
-		})
+		Ok(References(ids))
 	}
 }
 
-impl References {
-	#[inline]
-	pub fn ids(&self) -> &[MessageId] {
-		&self.ids
+impl Deref for References {
+	type Target = [MessageId];
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
 	}
 }
