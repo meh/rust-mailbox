@@ -31,8 +31,9 @@ pub struct Header {
 
 pub type Item = OwningRef<Rc<String>, str>;
 
-pub fn item(string: String) -> Item {
-	OwningRef::new(Rc::new(string)).map(|s| s.as_ref())
+#[inline(always)]
+pub fn item<T: Into<String>>(string: T) -> Item {
+	OwningRef::new(Rc::new(string.into())).map(|s| s.as_ref())
 }
 
 impl Header {
@@ -55,7 +56,8 @@ impl Header {
 	}
 
 	#[inline]
-	pub fn new(string: String) -> io::Result<Self> {
+	pub fn new<T: Into<String>>(string: T) -> io::Result<Self> {
+		let string       = string.into();
 		let (key, value) = try!(Header::ranges(&string));
 
 		Ok(Header {
