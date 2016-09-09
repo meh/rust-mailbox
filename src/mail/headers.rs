@@ -19,13 +19,13 @@ use header::Header;
 use stream::entry::{self, header};
 
 #[derive(Clone, Default, Debug)]
-pub struct Headers(HashMap<header::Item, Vec<entry::Header>>);
+pub struct Headers(HashMap<header::Item, Vec<header::Item>>);
 
 impl Headers {
 	#[inline]
 	#[doc(hidden)]
-	pub fn insert(&mut self, value: entry::Header) {
-		self.0.entry(value.key()).or_insert_with(Vec::new).push(value);
+	pub fn insert(&mut self, header: entry::Header) {
+		self.0.entry(header.key()).or_insert_with(Vec::new).push(header.value());
 	}
 
 	#[inline]
@@ -41,9 +41,9 @@ impl Headers {
 	}
 
 	#[inline]
-	pub fn get_raw<T: AsRef<str>>(&self, key: T) -> Option<Vec<header::Item>> {
-		self.0.get(key.as_ref().header(Default::default()).as_ref()).map(|slice|
-			slice.iter().map(|h| h.value()).collect())
+	pub fn get_raw<T: AsRef<str>>(&self, key: T) -> Option<&[header::Item]> {
+		self.0.get(key.as_ref().header(Default::default()).as_ref())
+			.map(|v| v.as_ref())
 	}
 
 	#[inline]
@@ -67,7 +67,7 @@ impl Headers {
 	}
 
 	#[inline]
-	pub fn keys(&self) -> hash_map::Keys<header::Item, Vec<entry::Header>> {
+	pub fn keys(&self) -> hash_map::Keys<header::Item, Vec<header::Item>> {
 		self.0.keys()
 	}
 
@@ -78,8 +78,8 @@ impl Headers {
 }
 
 pub struct HeaderView<'a> {
-	key:   &'a header::Item,
-	value: &'a Vec<entry::Header>,
+	key:    &'a header::Item,
+	values: &'a [header::Item],
 }
 
 impl<'a> HeaderView<'a> {
@@ -92,11 +92,11 @@ impl<'a> HeaderView<'a> {
 	}
 
 	pub fn value<H: Header>(&self) -> io::Result<H> {
-		H::parse(self.value)
+		H::parse(self.values)
 	}
 
-	pub fn raw(&self) -> &[entry::Header] {
-		self.value
+	pub fn raw(&self) -> &[header::Item] {
+		self.values
 	}
 }
 
@@ -110,17 +110,17 @@ impl<'a> IntoIterator for &'a Headers {
 	}
 }
 
-pub struct Iter<'a>(hash_map::Iter<'a, header::Item, Vec<entry::Header>>);
+pub struct Iter<'a>(hash_map::Iter<'a, header::Item, Vec<header::Item>>);
 
 impl<'a> Iterator for Iter<'a> {
 	type Item = HeaderView<'a>;
 
 	#[inline]
 	fn next(&mut self) -> Option<Self::Item> {
-		if let Some((key, slice)) = self.0.next() {
+		if let Some((key, values)) = self.0.next() {
 			Some(HeaderView {
-				key:   key,
-				value: slice,
+				key:    key,
+				values: values,
 			})
 		}
 		else {

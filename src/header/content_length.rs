@@ -14,7 +14,7 @@
 
 use std::io;
 use std::ops::Deref;
-use stream::entry;
+use stream::entry::header;
 use super::Header;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
@@ -27,8 +27,8 @@ impl Header for ContentLength {
 	}
 
 	#[inline]
-	fn parse(entries: &[entry::Header]) -> io::Result<Self> {
-		Ok(ContentLength(try!(entries[0].value().parse().map_err(|_|
+	fn parse(values: &[header::Item]) -> io::Result<Self> {
+		Ok(ContentLength(try!(values[0].parse().map_err(|_|
 			io::Error::new(io::ErrorKind::InvalidInput, "invalid content length")))))
 	}
 }

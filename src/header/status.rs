@@ -13,7 +13,7 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
-use stream::entry;
+use stream::entry::header;
 use super::Header;
 
 bitflags! {
@@ -34,10 +34,10 @@ impl Header for Status {
 	}
 
 	#[inline]
-	fn parse(entries: &[entry::Header]) -> io::Result<Self> {
+	fn parse(values: &[header::Item]) -> io::Result<Self> {
 		let mut status = Status::empty();
 
-		for ch in entries[0].value().chars() {
+		for ch in values[0].chars() {
 			status |= match ch {
 				'R' => SEEN,
 				'O' => OLD,

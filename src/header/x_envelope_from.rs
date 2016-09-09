@@ -13,7 +13,7 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
-use stream::entry;
+use stream::entry::header;
 use util::Address;
 use super::Header;
 
@@ -28,9 +28,9 @@ impl Header for XEnvelopeFrom {
 	}
 
 	#[inline]
-	fn parse(entries: &[entry::Header]) -> io::Result<Self> {
+	fn parse(values: &[header::Item]) -> io::Result<Self> {
 		Ok(XEnvelopeFrom {
-			address: try!(Address::new(entries[0].value()))
+			address: try!(Address::new(values[0].clone()))
 		})
 	}
 }

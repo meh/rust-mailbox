@@ -13,11 +13,11 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
-use stream::entry;
+use stream::entry::header;
 
 pub trait Header: Sized {
 	fn name() -> &'static str;
-	fn parse(entries: &[entry::Header]) -> io::Result<Self>;
+	fn parse(entries: &[header::Item]) -> io::Result<Self>;
 }
 
 pub mod status;
