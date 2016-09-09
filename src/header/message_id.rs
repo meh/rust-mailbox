@@ -27,7 +27,13 @@ impl Header for MessageId {
 
 	#[inline]
 	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(MessageId(try!(Address::new(values[0].clone()))))
+		let address = try!(Address::new(values[0].clone()));
+
+		if address.host().is_none() {
+			return Err(io::Error::new(io::ErrorKind::InvalidInput, "missing host"));
+		}
+
+		Ok(MessageId(address))
 	}
 }
 
