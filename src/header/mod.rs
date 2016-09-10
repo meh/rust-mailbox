@@ -76,3 +76,6 @@ pub use self::subject::Subject;
 
 mod references;
 pub use self::references::References;
+
+mod content_transfer_encoding;
+pub use self::content_transfer_encoding::ContentTransferEncoding;
