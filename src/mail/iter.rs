@@ -64,6 +64,7 @@ impl<R: Read> Iterator for Iter<R> {
 			);
 		}
 
+		// The first entry must be an `Entry::Begin`.
 		let origin = if let Entry::Begin(origin) = try!(eof!(self.input.next())) {
 			origin
 		}
@@ -78,14 +79,17 @@ impl<R: Read> Iterator for Iter<R> {
 		// Read headers.
 		loop {
 			match try!(eof!(self.input.next())) {
+				// This shouldn't happen.
 				Entry::Begin(_) => {
 					return Some(Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid state")));
 				}
 
+				// Insert the header.
 				Entry::Header(header) => {
 					headers.insert(header);
 				}
 
+				// The body started.
 				Entry::Body(value) => {
 					if self.body {
 						body.append(value);
@@ -94,6 +98,7 @@ impl<R: Read> Iterator for Iter<R> {
 					break;
 				}
 
+				// There was no body.
 				Entry::End => {
 					ended = true;
 					break;
@@ -101,7 +106,7 @@ impl<R: Read> Iterator for Iter<R> {
 			}
 		}
 
-		// Read body unless there is none.
+		// Read body if there is one.
 		if !ended {
 			while let Entry::Body(value) = try!(eof!(self.input.next())) {
 				if self.body {
