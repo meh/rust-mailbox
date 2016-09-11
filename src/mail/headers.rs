@@ -83,18 +83,22 @@ pub struct HeaderView<'a> {
 }
 
 impl<'a> HeaderView<'a> {
+	#[inline]
 	pub fn is<H: Header>(&self) -> bool {
 		self.key.as_ref() == H::name()
 	}
 
+	#[inline]
 	pub fn name(&self) -> &str {
 		self.key.as_ref()
 	}
 
+	#[inline]
 	pub fn value<H: Header>(&self) -> io::Result<H> {
 		H::parse(self.values)
 	}
 
+	#[inline]
 	pub fn raw(&self) -> &[header::Item] {
 		self.values
 	}
