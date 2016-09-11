@@ -17,6 +17,7 @@ extern crate lazy_static;
 #[macro_use]
 extern crate bitflags;
 extern crate owning_ref;
+extern crate fnv;
 
 #[macro_use]
 extern crate nom;

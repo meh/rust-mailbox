@@ -13,13 +13,21 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::collections::{hash_map, HashMap};
+use std::hash::BuildHasherDefault;
 use std::io;
+use fnv::FnvHasher;
 use casing::Casing;
 use header::Header;
 use stream::entry::{self, header};
 
-#[derive(Clone, Default, Debug)]
-pub struct Headers(HashMap<header::Item, Vec<header::Item>>);
+#[derive(Clone, Debug)]
+pub struct Headers(HashMap<header::Item, Vec<header::Item>, BuildHasherDefault<FnvHasher>>);
+
+impl Default for Headers {
+	fn default() -> Self {
+		Headers(HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default()))
+	}
+}
 
 impl Headers {
 	#[inline]
