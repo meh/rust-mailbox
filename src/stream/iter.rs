@@ -159,8 +159,6 @@ impl<R: Read> Iterator for Iter<R> {
 					return Some(Ok(Entry::Body(line)));
 				}
 			}
-
-			return None;
 		}
 	}
 }
