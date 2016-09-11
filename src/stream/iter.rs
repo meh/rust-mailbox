@@ -96,8 +96,6 @@ impl<R: Read> Iterator for Iter<R> {
 				}
 
 				State::Header => {
-					let mut line = utf8!(String::from_utf8(line));
-
 					// If the line is empty the header section is over.
 					if line.is_empty() {
 						self.state = State::Body;
@@ -105,9 +103,11 @@ impl<R: Read> Iterator for Iter<R> {
 					}
 
 					// There's an escaped line after the beginning.
-					if line.starts_with('>') {
-						return Some(Ok(Entry::Escape((&line[1..]).into())));
+					if line[0] == b'>' {
+						continue;
 					}
+
+					let mut line = line;
 
 					// Read lines until there are no folded headers.
 					loop {
@@ -116,7 +116,7 @@ impl<R: Read> Iterator for Iter<R> {
 						if let Ok(ref current) = *eof!(self.input.peek()) {
 							match current.first() {
 								Some(&b' ') | Some(&b'\t') => {
-									line.push_str(utf8!(str::from_utf8(&current)));
+									line.extend_from_slice(&current);
 									consumed = true;
 								}
 
@@ -133,14 +133,18 @@ impl<R: Read> Iterator for Iter<R> {
 					}
 
 					// Parse the header and return any errors.
-					return Some(Ok(Entry::Header(try!(entry::Header::new(line)))));
+					return Some(Ok(Entry::Header(try!(entry::Header::new(utf8!(String::from_utf8(line)))))));
 				}
 
 				State::Body => {
+					// If the line is empty there's a newline in the content or a new
+					// mail is beginning.
 					if line.is_empty() {
 						if let Ok(ref current) = *eof!(self.input.peek()) {
+							// If it starts with "From " it may or may not be a new mail.
 							if current.starts_with(b"From ") {
 								if let Ok(string) = str::from_utf8(current) {
+									// Try to parse the beginning, if it parses it's a new mail.
 									if entry::Begin::ranges(string).is_ok() {
 										self.state = State::Begin;
 										return Some(Ok(Entry::End));
@@ -151,9 +155,8 @@ impl<R: Read> Iterator for Iter<R> {
 
 						return Some(Ok(Entry::Body(vec![])));
 					}
-					else {
-						return Some(Ok(Entry::Body(line)));
-					}
+
+					return Some(Ok(Entry::Body(line)));
 				}
 			}
 

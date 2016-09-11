@@ -15,7 +15,6 @@
 #[derive(Clone, Debug)]
 pub enum Entry {
 	Begin(Begin),
-	Escape(String),
 	Header(Header),
 	Body(Vec<u8>),
 	End,

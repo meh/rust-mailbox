@@ -82,8 +82,6 @@ impl<R: Read> Iterator for Iter<R> {
 					return Some(Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid state")));
 				}
 
-				Entry::Escape(_) => (),
-
 				Entry::Header(header) => {
 					headers.insert(header);
 				}
