@@ -143,6 +143,7 @@ impl<R: Read> Iterator for Iter<R> {
 						if let Ok(ref current) = *eof!(self.input.peek()) {
 							// If it starts with "From " it may or may not be a new mail.
 							if current.starts_with(b"From ") {
+								// If it's not ASCII it cannot be a mail beginning.
 								if let Ok(string) = str::from_utf8(current) {
 									// Try to parse the beginning, if it parses it's a new mail.
 									if entry::Begin::ranges(string).is_ok() {
