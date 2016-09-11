@@ -49,10 +49,12 @@ impl Address {
 		}
 	}
 
+	#[inline]
 	pub fn parse<T: AsRef<str>>(string: T) -> io::Result<Self> {
 		Address::new(header::item(string.as_ref()))
 	}
 
+	#[inline]
 	pub fn new(string: header::Item) -> io::Result<Self> {
 		let (name, user, host) = try!(Address::ranges(&string));
 
