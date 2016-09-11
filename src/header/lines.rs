@@ -21,7 +21,7 @@ use super::Header;
 pub struct Lines(pub usize);
 
 impl Header for Lines {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Lines"
 	}

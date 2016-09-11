@@ -21,7 +21,7 @@ use super::Header;
 pub struct XEnvelopeFrom(Address);
 
 impl Header for XEnvelopeFrom {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"X-Envelope-From"
 	}

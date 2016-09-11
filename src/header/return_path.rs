@@ -21,7 +21,7 @@ use super::Header;
 pub struct ReturnPath(Address);
 
 impl Header for ReturnPath {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Return-Path"
 	}

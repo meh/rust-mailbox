@@ -22,7 +22,7 @@ use super::Header;
 pub struct XRemoteAddr(IpAddr);
 
 impl Header for XRemoteAddr {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"X-Remote-Addr"
 	}

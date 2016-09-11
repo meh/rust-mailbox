@@ -21,7 +21,7 @@ use super::Header;
 pub struct ContentLength(pub usize);
 
 impl Header for ContentLength {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Content-Length"
 	}

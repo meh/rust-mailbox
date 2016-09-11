@@ -21,7 +21,7 @@ use super::Header;
 pub struct Cc(Vec<Address>);
 
 impl Header for Cc {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Cc"
 	}

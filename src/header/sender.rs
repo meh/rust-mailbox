@@ -21,7 +21,7 @@ use super::Header;
 pub struct Sender(Address);
 
 impl Header for Sender {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Sender"
 	}

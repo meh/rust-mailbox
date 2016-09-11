@@ -21,7 +21,7 @@ use super::{Header, MessageId};
 pub struct References(Vec<MessageId>);
 
 impl Header for References {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"References"
 	}

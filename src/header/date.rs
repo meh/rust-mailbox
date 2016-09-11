@@ -22,7 +22,7 @@ use super::Header;
 pub struct Date(DateTime<FixedOffset>);
 
 impl Header for Date {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Date"
 	}

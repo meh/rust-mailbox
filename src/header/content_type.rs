@@ -22,7 +22,7 @@ use super::Header;
 pub struct ContentType(Mime);
 
 impl Header for ContentType {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Content-Length"
 	}

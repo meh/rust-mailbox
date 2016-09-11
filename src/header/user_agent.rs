@@ -20,7 +20,7 @@ use super::Header;
 pub struct UserAgent(header::Item);
 
 impl Header for UserAgent {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"User-Agent"
 	}

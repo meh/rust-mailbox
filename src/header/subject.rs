@@ -20,7 +20,7 @@ use super::Header;
 pub struct Subject(header::Item);
 
 impl Header for Subject {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Subject"
 	}

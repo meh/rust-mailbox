@@ -21,7 +21,7 @@ use super::Header;
 pub struct ReplyTo(Address);
 
 impl Header for ReplyTo {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Reply-To"
 	}

@@ -28,7 +28,7 @@ pub enum ContentTransferEncoding {
 }
 
 impl Header for ContentTransferEncoding {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Content-Transfer-Encoding"
 	}

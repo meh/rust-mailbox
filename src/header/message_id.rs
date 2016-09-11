@@ -20,7 +20,7 @@ use super::Header;
 pub struct MessageId(pub Address);
 
 impl Header for MessageId {
-	#[inline]
+	#[inline(always)]
 	fn name() -> &'static str {
 		"Message-ID"
 	}
