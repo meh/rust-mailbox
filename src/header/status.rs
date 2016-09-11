@@ -18,12 +18,13 @@ use super::Header;
 
 bitflags! {
 	pub flags Status: u8 {
-		const SEEN     = 0b00000001,
-		const OLD      = 0b00000010,
-		const ANSWERED = 0b00000100,
-		const FLAGGED  = 0b00001000,
-		const DRAFT    = 0b00010000,
-		const DELETED  = 0b00100000,
+		const NEW      = 0b00000001,
+		const SEEN     = 0b00000010,
+		const OLD      = 0b00000100,
+		const ANSWERED = 0b00001000,
+		const FLAGGED  = 0b00010000,
+		const DRAFT    = 0b00100000,
+		const DELETED  = 0b01000000,
 	}
 }
 
@@ -39,6 +40,7 @@ impl Header for Status {
 
 		for ch in values[0].chars() {
 			status |= match ch {
+				'N' => NEW,
 				'R' => SEEN,
 				'O' => OLD,
 				'A' => ANSWERED,
@@ -65,6 +67,11 @@ mod test {
 		($str:expr) => (
 			<Status as Header>::parse(&[header::item($str)])
 		);
+	}
+
+	#[test]
+	fn new() {
+		assert_eq!(parse!("N").unwrap(), NEW);
 	}
 
 	#[test]
