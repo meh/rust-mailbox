@@ -116,7 +116,7 @@ impl<R: Read> Iterator for Iter<R> {
 						if let Ok(ref current) = *eof!(self.input.peek()) {
 							match current.first() {
 								Some(&b' ') | Some(&b'\t') => {
-									line.extend_from_slice(&current);
+									line.extend_from_slice(current);
 									consumed = true;
 								}
 
