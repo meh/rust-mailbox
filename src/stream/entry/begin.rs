@@ -57,7 +57,7 @@ impl Begin {
 	}
 
 	#[inline]
-	pub fn address_range(&self) -> Range<usize> {
+	fn address_range(&self) -> Range<usize> {
 		Range { start: self.address.start, end: self.address.end }
 	}
 
@@ -67,7 +67,7 @@ impl Begin {
 	}
 
 	#[inline]
-	pub fn timestamp_range(&self) -> Range<usize> {
+	fn timestamp_range(&self) -> Range<usize> {
 		Range { start: self.timestamp.start, end: self.timestamp.end }
 	}
 

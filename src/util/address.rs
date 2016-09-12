@@ -68,7 +68,7 @@ impl Address {
 	}
 
 	#[inline]
-	pub fn name_range(&self) -> Option<Range<usize>>  {
+	fn name_range(&self) -> Option<Range<usize>>  {
 		self.name.as_ref().map(|r| Range { start: r.start, end: r.end })
 	}
 
@@ -78,7 +78,7 @@ impl Address {
 	}
 
 	#[inline]
-	pub fn user_range(&self) -> Range<usize>  {
+	fn user_range(&self) -> Range<usize>  {
 		Range { start: self.user.start, end: self.user.end }
 	}
 
@@ -88,7 +88,7 @@ impl Address {
 	}
 
 	#[inline]
-	pub fn host_range(&self) -> Option<Range<usize>>  {
+	fn host_range(&self) -> Option<Range<usize>>  {
 		self.host.as_ref().map(|r| Range { start: r.start, end: r.end })
 	}
 

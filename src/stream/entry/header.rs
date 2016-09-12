@@ -69,7 +69,7 @@ impl Header {
 	}
 
 	#[inline]
-	pub fn key_range(&self) -> Range<usize> {
+	fn key_range(&self) -> Range<usize> {
 		Range { start: self.key.start, end: self.key.end }
 	}
 
@@ -82,7 +82,7 @@ impl Header {
 	}
 
 	#[inline]
-	pub fn value_range(&self) -> Range<usize> {
+	fn value_range(&self) -> Range<usize> {
 		Range { start: self.value.start, end: self.value.end }
 	}
 
