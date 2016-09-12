@@ -18,7 +18,7 @@ use chrono::{DateTime, FixedOffset};
 use stream::entry::header;
 use super::Header;
 
-#[derive(Eq, PartialEq, Clone, Debug)]
+#[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Debug)]
 pub struct Date(DateTime<FixedOffset>);
 
 impl Header for Date {
