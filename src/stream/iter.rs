@@ -33,7 +33,7 @@ impl<R: Read> Iter<R> {
 	#[inline]
 	pub fn new(input: R) -> Self {
 		Iter {
-			input: Lines::new(BufReader::new(input)).peekable(),
+			input: super::lines(input).peekable(),
 			state: State::Begin,
 		}
 	}
@@ -84,7 +84,7 @@ impl<R: Read> Iterator for Iter<R> {
 		}
 
 		loop {
-			let line = try!(eof!(self.input.next()));
+			let (offset, line) = try!(eof!(self.input.next()));
 
 			match self.state {
 				State::Begin => {
@@ -92,7 +92,7 @@ impl<R: Read> Iterator for Iter<R> {
 					let value  = try!(entry::Begin::new(utf8!(String::from_utf8(line))));
 					self.state = State::Header;
 
-					return Some(Ok(Entry::Begin(value)));
+					return Some(Ok(Entry::Begin(offset, value)));
 				}
 
 				State::Header => {
@@ -113,7 +113,7 @@ impl<R: Read> Iterator for Iter<R> {
 					loop {
 						let consumed;
 
-						if let Ok(ref current) = *eof!(self.input.peek()) {
+						if let Ok((_, ref current)) = *eof!(self.input.peek()) {
 							match current.first() {
 								Some(&b' ') | Some(&b'\t') => {
 									line.extend_from_slice(current);
@@ -140,7 +140,7 @@ impl<R: Read> Iterator for Iter<R> {
 					// If the line is empty there's a newline in the content or a new
 					// mail is beginning.
 					if line.is_empty() {
-						if let Ok(ref current) = *eof!(self.input.peek()) {
+						if let Ok((_, ref current)) = *eof!(self.input.peek()) {
 							// If it starts with "From " it may or may not be a new mail.
 							if current.starts_with(b"From ") {
 								// If it's not ASCII it cannot be a mail beginning.

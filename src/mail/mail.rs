@@ -17,6 +17,7 @@ use super::{Headers, Body};
 
 #[derive(Clone, Debug)]
 pub struct Mail {
+	offset:  u64,
 	origin:  stream::entry::Begin,
 	headers: Headers,
 	body:    Body,
@@ -24,12 +25,18 @@ pub struct Mail {
 
 impl Mail {
 	#[inline]
-	pub fn new(origin: stream::entry::Begin, headers: Headers, body: Body) -> Self {
+	pub fn new(offset: u64, origin: stream::entry::Begin, headers: Headers, body: Body) -> Self {
 		Mail {
+			offset:  offset,
 			origin:  origin,
 			headers: headers,
 			body:    body,
 		}
+	}
+
+	#[inline]
+	pub fn offset(&self) -> u64 {
+		self.offset
 	}
 
 	#[inline]

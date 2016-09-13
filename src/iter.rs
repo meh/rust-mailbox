@@ -65,8 +65,8 @@ impl<R: Read> Iterator for Iter<R> {
 		}
 
 		// The first entry must be an `Entry::Begin`.
-		let origin = if let Entry::Begin(origin) = try!(eof!(self.input.next())) {
-			origin
+		let (offset, origin) = if let Entry::Begin(offset, origin) = try!(eof!(self.input.next())) {
+			(offset, origin)
 		}
 		else {
 			return Some(Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid state")));
@@ -80,7 +80,7 @@ impl<R: Read> Iterator for Iter<R> {
 		loop {
 			match try!(eof!(self.input.next())) {
 				// This shouldn't happen.
-				Entry::Begin(_) => {
+				Entry::Begin(..) => {
 					return Some(Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid state")));
 				}
 
@@ -115,6 +115,6 @@ impl<R: Read> Iterator for Iter<R> {
 			}
 		}
 
-		Some(Ok(Mail::new(origin, headers, body)))
+		Some(Ok(Mail::new(offset, origin, headers, body)))
 	}
 }
