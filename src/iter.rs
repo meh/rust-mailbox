@@ -14,7 +14,7 @@
 
 use std::io::{self, Read};
 use stream::{self, Entry};
-use super::{Mail, Headers, Body};
+use mail::{Mail, Headers, Body};
 
 pub struct Iter<R: Read> {
 	input: stream::Iter<R>,
@@ -25,7 +25,7 @@ impl<R: Read> Iter<R> {
 	#[inline]
 	pub fn new(input: R) -> Self {
 		Iter {
-			input: stream::read(input),
+			input: stream::entries(input),
 			body:  true,
 		}
 	}

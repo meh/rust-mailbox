@@ -34,12 +34,15 @@ pub use header::Header;
 
 pub mod stream;
 
-pub mod mail;
+mod mail;
 pub use mail::Mail;
+
+mod iter;
+pub use iter::Iter;
 
 use std::io::Read;
 
 #[inline]
-pub fn read<R: Read>(input: R) -> mail::Iter<R> {
-	mail::read(input)
+pub fn read<R: Read>(input: R) -> Iter<R> {
+	Iter::new(input)
 }

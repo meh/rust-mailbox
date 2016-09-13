@@ -21,9 +21,14 @@ pub use self::lines::Lines;
 mod iter;
 pub use self::iter::Iter;
 
-use std::io::Read;
+use std::io::{Read, BufReader};
 
 #[inline]
-pub fn read<R: Read>(input: R) -> Iter<R> {
+pub fn entries<R: Read>(input: R) -> Iter<R> {
 	Iter::new(input)
+}
+
+#[inline]
+pub fn lines<R: Read>(input: R) -> Lines<BufReader<R>> {
+	Lines::new(BufReader::new(input))
 }

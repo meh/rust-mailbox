@@ -20,13 +20,3 @@ pub use self::headers::Headers;
 
 mod body;
 pub use self::body::Body;
-
-mod iter;
-pub use self::iter::Iter;
-
-use std::io::Read;
-
-#[inline]
-pub fn read<R: Read>(input: R) -> Iter<R> {
-	Iter::new(input)
-}
