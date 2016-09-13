@@ -13,7 +13,6 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io::{self, BufReader, Read};
-use std::str;
 use std::iter::Peekable;
 use super::{entry, Entry, Lines};
 
@@ -133,7 +132,7 @@ impl<R: Read> Iterator for Iter<R> {
 					}
 
 					// Parse the header and return any errors.
-					return Some(Ok(Entry::Header(try!(entry::Header::new(utf8!(String::from_utf8(line)))))));
+					return Some(Ok(Entry::Header(try!(entry::Header::new(line)))));
 				}
 
 				State::Body => {
@@ -141,16 +140,10 @@ impl<R: Read> Iterator for Iter<R> {
 					// mail is beginning.
 					if line.is_empty() {
 						if let Ok((_, ref current)) = *eof!(self.input.peek()) {
-							// If it starts with "From " it may or may not be a new mail.
-							if current.starts_with(b"From ") {
-								// If it's not ASCII it cannot be a mail beginning.
-								if let Ok(string) = str::from_utf8(current) {
-									// Try to parse the beginning, if it parses it's a new mail.
-									if entry::Begin::ranges(string).is_ok() {
-										self.state = State::Begin;
-										return Some(Ok(Entry::End));
-									}
-								}
+							// Try to parse the beginning, if it parses it's a new mail.
+							if entry::Begin::ranges(current).is_ok() {
+								self.state = State::Begin;
+								return Some(Ok(Entry::End));
 							}
 						}
 					}

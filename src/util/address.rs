@@ -15,9 +15,7 @@
 use std::fmt::{self, Write};
 use std::ops::Range;
 use std::io;
-use std::str;
-use nom::{eof, rest, IResult};
-use util::parser::{is_whitespace};
+use nom::IResult;
 use stream::entry::header;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
@@ -33,7 +31,7 @@ impl Address {
 	pub fn ranges<T: AsRef<str>>(string: T) -> io::Result<(Option<Range<usize>>, Range<usize>, Option<Range<usize>>)> {
 		let string = string.as_ref();
 
-		if let IResult::Done(_, (name, user, host)) = parse(string.as_bytes()) {
+		if let IResult::Done(_, (name, user, host)) = parser::parse(string.as_bytes()) {
 			let n = name.map(|n| n.as_ptr() as usize - string.as_ptr() as usize);
 			let u = user.as_ptr() as usize - string.as_ptr() as usize;
 			let h = host.map(|h| h.as_ptr() as usize - string.as_ptr() as usize);
@@ -108,75 +106,79 @@ impl fmt::Display for Address {
 	}
 }
 
-named!(parse(&[u8]) -> (Option<&str>, &str, Option<&str>),
-	chain!(
-		take_while!(is_whitespace) ~
-		name: opt!(complete!(name)) ~
-		take_while!(is_whitespace) ~
-		addr: address ~
-		eof,
+mod parser {
+	use std::str;
+	use nom::eof;
+	use util::parser::{WSP, is_ws};
 
-		|| unsafe {
-			let name = name.and_then(|s| {
-				let value = str::from_utf8_unchecked(s).trim();
+	named!(pub parse(&[u8]) -> (Option<&str>, &str, Option<&str>),
+		chain!(
+			take_while!(is_ws) ~
+			name: opt!(complete!(name)) ~
+			take_while!(is_ws) ~
+			addr: address ~
+			eof,
 
-				if value.len() > 0 {
-					Some(value)
-				}
-				else {
-					None
-				}
-			});
+			|| unsafe {
+				let name = name.and_then(|s| {
+					let value = str::from_utf8_unchecked(s).trim();
 
-			let user = str::from_utf8_unchecked(addr.0);
-			let host = addr.1.map(|s| str::from_utf8_unchecked(s));
+					if value.len() > 0 {
+						Some(value)
+					}
+					else {
+						None
+					}
+				});
 
-			(name, user, host)
-		}));
+				let user = str::from_utf8_unchecked(addr.0);
+				let host = addr.1.map(|s| str::from_utf8_unchecked(s));
 
-named!(name(&[u8]) -> &[u8],
-	alt!(name_quoted | name_bare));
+				(name, user, host)
+			}));
 
-named!(name_quoted(&[u8]) -> &[u8],
-	chain!(
-		name: delimited!(char!('"'), is_not!("\""), char!('"')) ~
-		take_until!("<"),
+	named!(name(&[u8]) -> &[u8],
+		alt!(name_quoted | name_bare));
 
-		|| { name }));
+	named!(name_quoted(&[u8]) -> &[u8],
+		chain!(
+			name: delimited!(char!('"'), is_not!("\""), char!('"')) ~
+			take_until!("<"),
 
-named!(name_bare(&[u8]) -> &[u8],
-	chain!(
-		take_while!(is_whitespace) ~
-		name: take_until!("<"),
+			|| { name }));
 
-		|| { name }));
+	named!(name_bare(&[u8]) -> &[u8],
+		chain!(
+			take_while!(is_ws) ~
+			name: take_until!("<"),
 
-named!(address(&[u8]) -> (&[u8], Option<&[u8]>),
-	alt!(address_quoted | address_bare | address_user_only));
+			|| { name }));
 
-named!(address_quoted(&[u8]) -> (&[u8], Option<&[u8]>),
-	chain!(
-		char!('<') ~
-		user: take_until!("@") ~
-		char!('@') ~
-		host: take_until!(">") ~
-		char!('>'),
+	named!(address(&[u8]) -> (&[u8], Option<&[u8]>),
+		alt!(address_quoted | address_bare | address_user_only));
 
-		|| { (user, Some(host)) }));
+	named!(address_quoted(&[u8]) -> (&[u8], Option<&[u8]>),
+		chain!(
+			char!('<') ~
+			user: take_until!("@") ~
+			char!('@') ~
+			host: take_until!(">") ~
+			char!('>'),
 
-named!(address_bare(&[u8]) -> (&[u8], Option<&[u8]>),
-	chain!(
-		user: take_until!("@") ~
-		char!('@') ~
-		host: rest, // FIXME: actually need a take_until!(WS) | eof
+			|| { (user, Some(host)) }));
 
-		|| { (user, Some(host)) }));
+	named!(address_bare(&[u8]) -> (&[u8], Option<&[u8]>),
+		chain!(
+			user: take_until!("@") ~
+			char!('@') ~
+			host: take_until_either_or_eof!(WSP),
 
-named!(address_user_only(&[u8]) -> (&[u8], Option<&[u8]>),
-	chain!(
-		user: rest, // FIXME: actually need a take_until!(WS) | eof
+			|| { (user, Some(host)) }));
 
-		|| { (user, None) }));
+	named!(address_user_only(&[u8]) -> (&[u8], Option<&[u8]>),
+		map!(take_until_either_or_eof!(WSP),
+			|user| (user, None)));
+}
 
 #[cfg(test)]
 mod test {

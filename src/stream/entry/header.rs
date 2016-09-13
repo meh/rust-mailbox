@@ -17,8 +17,7 @@ use std::io;
 use std::rc::Rc;
 use std::borrow::Cow;
 use owning_ref::OwningRef;
-use nom::{rest, IResult};
-use util::parser::is_whitespace;
+use nom::IResult;
 use casing::Casing;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
@@ -38,10 +37,10 @@ pub fn item<T: Into<String>>(string: T) -> Item {
 
 impl Header {
 	#[inline]
-	pub fn ranges<T: AsRef<str>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
-		let string = string.as_ref().as_bytes();
+	pub fn ranges<T: AsRef<[u8]>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
+		let string = string.as_ref();
 
-		if let IResult::Done(_, (key, value)) = parse(string) {
+		if let IResult::Done(_, (key, value)) = parser::parse(string) {
 			let k = key.as_ptr() as usize - string.as_ptr() as usize;
 			let v = value.as_ptr() as usize - string.as_ptr() as usize;
 
@@ -56,12 +55,12 @@ impl Header {
 	}
 
 	#[inline]
-	pub fn new<T: Into<String>>(string: T) -> io::Result<Self> {
+	pub fn new<T: Into<Vec<u8>>>(string: T) -> io::Result<Self> {
 		let string       = string.into();
 		let (key, value) = try!(Header::ranges(&string));
 
 		Ok(Header {
-			inner: item(string),
+			inner: item(unsafe { String::from_utf8_unchecked(string) }),
 
 			key:   key,
 			value: value,
@@ -82,17 +81,26 @@ impl Header {
 	}
 }
 
-named!(parse(&[u8]) -> (&[u8], &[u8]),
-	chain!(
-		key: key ~
-		tag!(":") ~
-		take_while!(is_whitespace) ~
-		value: rest,
+mod parser {
+	use nom::eof;
+	use util::parser::{is_ws, is_printable_no_colon, is_printable_or_ws};
 
-		|| { (key, value) }));
+	named!(pub parse(&[u8]) -> (&[u8], &[u8]),
+		chain!(
+			key: key ~
+			tag!(":") ~
+			take_while!(is_ws) ~
+			value: value ~
+			eof,
 
-named!(key(&[u8]) -> &[u8],
-	take_until!(":"));
+			|| { (key, value) }));
+
+	named!(key(&[u8]) -> &[u8],
+		take_while!(is_printable_no_colon));
+
+	named!(value(&[u8]) -> &[u8],
+		take_while!(is_printable_or_ws));
+}
 
 #[cfg(test)]
 mod test {

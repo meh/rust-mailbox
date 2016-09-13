@@ -14,8 +14,7 @@
 
 use std::ops::Range;
 use std::io;
-use nom::{eof, IResult};
-use util::parser::{WS, is_whitespace};
+use nom::IResult;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Begin {
@@ -27,29 +26,31 @@ pub struct Begin {
 
 impl Begin {
 	#[inline]
-	pub fn ranges<T: AsRef<str>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
-		let string = string.as_ref().as_bytes();
+	pub fn ranges<T: AsRef<[u8]>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
+		let string = string.as_ref();
 
-		if let IResult::Done(_, (address, timestamp)) = parse(string) {
-			let a = address.as_ptr() as usize - string.as_ptr() as usize;
-			let t = timestamp.as_ptr() as usize - string.as_ptr() as usize;
+		if let IResult::Done(_, (address, timestamp)) = parser::parse(string) {
+			if timestamp.len() == 24 {
+				let a = address.as_ptr() as usize - string.as_ptr() as usize;
+				let t = timestamp.as_ptr() as usize - string.as_ptr() as usize;
 
-			return Ok((
-				Range { start: a, end: a + address.len() },
-				Range { start: t, end: t + timestamp.len() },
-			));
+				return Ok((
+					Range { start: a, end: a + address.len() },
+					Range { start: t, end: t + timestamp.len() },
+				));
+			}
 		}
 
 		Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid beginning"))
 	}
 
 	#[inline]
-	pub fn new<T: Into<String>>(string: T) -> io::Result<Self> {
+	pub fn new<T: Into<Vec<u8>>>(string: T) -> io::Result<Self> {
 		let string               = string.into();
 		let (address, timestamp) = try!(Begin::ranges(&string));
 
 		Ok(Begin {
-			inner: string,
+			inner: unsafe { String::from_utf8_unchecked(string) },
 
 			address:   address,
 			timestamp: timestamp,
@@ -67,22 +68,27 @@ impl Begin {
 	}
 }
 
-named!(parse(&[u8]) -> (&[u8], &[u8]),
-	chain!(
-		tag!("From ") ~
-		take_while!(is_whitespace) ~
-		addr: address ~
-		take_while!(is_whitespace) ~
-		time: timestamp ~
-		eof,
+mod parser {
+	use nom::eof;
+	use util::parser::{is_ws, is_printable, is_printable_or_ws};
 
-		|| { (addr, time) }));
+	named!(pub parse(&[u8]) -> (&[u8], &[u8]),
+		chain!(
+			tag!("From ") ~
+			take_while!(is_ws) ~
+			addr: address ~
+			take_while!(is_ws) ~
+			time: timestamp ~
+			eof,
 
-named!(address(&[u8]) -> &[u8],
-	take_until_either!(WS));
+			|| { (addr, time) }));
 
-named!(timestamp(&[u8]) -> &[u8],
-	take!(24));
+	named!(address(&[u8]) -> &[u8],
+		take_while!(is_printable));
+
+	named!(timestamp(&[u8]) -> &[u8],
+		take_while_n!(24, is_printable_or_ws));
+}
 
 #[cfg(test)]
 mod test {
@@ -98,5 +104,6 @@ mod test {
 	#[test]
 	fn fail() {
 		assert!(Begin::new("From foo@example.com").is_err());
+		assert!(Begin::new("From foo@example.com Wed Nov 17 14:35:53 20109").is_err());
 	}
 }
