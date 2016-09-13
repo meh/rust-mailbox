@@ -173,7 +173,7 @@ mod test {
 		let mut iter = Iter::new(Cursor::new("From meh@schizofreni.co Wed Nov 17 14:35:53 2010\r\nSubject: I like trains\r\nFoo: bar\r\n baz\r\n\r\nHi!\r\n"));
 
 		{
-			if let Entry::Begin(item) = iter.next().unwrap().unwrap() {
+			if let Entry::Begin(_, item) = iter.next().unwrap().unwrap() {
 				assert_eq!(item.address(), "meh@schizofreni.co");
 				assert_eq!(item.timestamp(), "Wed Nov 17 14:35:53 2010");
 			}
