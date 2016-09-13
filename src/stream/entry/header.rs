@@ -69,26 +69,16 @@ impl Header {
 	}
 
 	#[inline]
-	fn key_range(&self) -> Range<usize> {
-		Range { start: self.key.start, end: self.key.end }
-	}
-
-	#[inline]
 	pub fn key(&self) -> Item {
-		match (&self.inner[self.key_range()]).header(Default::default()) {
-			Cow::Borrowed(_)   => self.inner.clone().map(|s| &s[self.key_range()]),
+		match (&self.inner[Range { start: self.key.start, end: self.key.end }]).header(Default::default()) {
+			Cow::Borrowed(_)   => self.inner.clone().map(|s| &s[Range { start: self.key.start, end: self.key.end }]),
 			Cow::Owned(string) => OwningRef::new(Rc::new(string)).map(|s| s.as_ref()),
 		}
 	}
 
 	#[inline]
-	fn value_range(&self) -> Range<usize> {
-		Range { start: self.value.start, end: self.value.end }
-	}
-
-	#[inline]
 	pub fn value(&self) -> Item {
-		self.inner.clone().map(|s| &s[self.value_range()])
+		self.inner.clone().map(|s| &s[Range { start: self.value.start, end: self.value.end }])
 	}
 }
 

@@ -57,23 +57,13 @@ impl Begin {
 	}
 
 	#[inline]
-	fn address_range(&self) -> Range<usize> {
-		Range { start: self.address.start, end: self.address.end }
-	}
-
-	#[inline]
 	pub fn address(&self) -> &str {
-		&self.inner[self.address_range()]
-	}
-
-	#[inline]
-	fn timestamp_range(&self) -> Range<usize> {
-		Range { start: self.timestamp.start, end: self.timestamp.end }
+		&self.inner[Range { start: self.address.start, end: self.address.end }]
 	}
 
 	#[inline]
 	pub fn timestamp(&self) -> &str {
-		&self.inner[self.timestamp_range()]
+		&self.inner[Range { start: self.timestamp.start, end: self.timestamp.end }]
 	}
 }
 
