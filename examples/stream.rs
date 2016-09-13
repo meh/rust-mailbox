@@ -4,9 +4,9 @@ use std::fs::File;
 use std::env;
 
 fn main() {
-	let stream = mailbox::stream::read(File::open(env::args().nth(1).expect("no file given")).unwrap());
+	let path = env::args().nth(1).expect("no file given");
 
-	for entry in stream {
+	for entry in mailbox::stream::entries(File::open(path).unwrap()) {
 		println!("{:?}", entry);
 	}
 }

@@ -1,5 +1,5 @@
 extern crate mailbox;
-use mailbox::{mail, header};
+use mailbox::header;
 
 use std::fs::File;
 use std::env;
@@ -18,7 +18,7 @@ pub struct Status {
 fn main() {
 	let mut status = Status::default();
 
-	for mail in mail::read(File::open(env::args().nth(1).expect("no file given")).unwrap()).body(false) {
+	for mail in mailbox::read(File::open(env::args().nth(1).expect("no file given")).unwrap()).body(false) {
 		if let Ok(mail) = mail {
 			let mut current = header::Status::empty();
 
