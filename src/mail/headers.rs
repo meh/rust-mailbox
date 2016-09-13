@@ -20,14 +20,8 @@ use casing::Casing;
 use header::Header;
 use stream::entry::{self, header};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Default, Debug)]
 pub struct Headers(HashMap<header::Item, Vec<header::Item>, BuildHasherDefault<FnvHasher>>);
-
-impl Default for Headers {
-	fn default() -> Self {
-		Headers(HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default()))
-	}
-}
 
 impl Headers {
 	#[inline]
