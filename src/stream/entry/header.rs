@@ -88,7 +88,7 @@ mod parser {
 	named!(pub parse(&[u8]) -> (&[u8], &[u8]),
 		chain!(
 			key: key ~
-			tag!(":") ~
+			char!(':') ~
 			take_while!(is_ws) ~
 			value: value ~
 			eof,
