@@ -24,7 +24,7 @@ pub struct ContentType(Mime);
 impl Header for ContentType {
 	#[inline(always)]
 	fn name() -> &'static str {
-		"Content-Length"
+		"Content-Type"
 	}
 
 	#[inline]
