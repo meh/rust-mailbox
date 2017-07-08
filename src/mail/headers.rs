@@ -25,8 +25,7 @@ pub struct Headers(HashMap<header::Item, Vec<header::Item>, BuildHasherDefault<F
 
 impl Headers {
 	#[inline]
-	#[doc(hidden)]
-	pub fn insert(&mut self, header: entry::Header) {
+	pub(crate) fn insert(&mut self, header: entry::Header) {
 		self.0.entry(header.key()).or_insert_with(Vec::new).push(header.value());
 	}
 

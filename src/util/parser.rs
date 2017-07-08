@@ -138,7 +138,7 @@ macro_rules! take_while_n {
 					$crate::nom::IResult::Done(&$input[n..], &$input[..n])
 				}
 				else {
-					$crate::nom::IResult::Error($crate::nom::Err::Position($crate::nom::ErrorKind::Tag, $input))
+					$crate::nom::IResult::Error($crate::nom::ErrorKind::Tag)
 				};
 
 				res

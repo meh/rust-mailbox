@@ -17,14 +17,14 @@ use stream::entry::header;
 use super::Header;
 
 bitflags! {
-	pub flags Status: u8 {
-		const NEW      = 0b00000001,
-		const SEEN     = 0b00000010,
-		const OLD      = 0b00000100,
-		const ANSWERED = 0b00001000,
-		const FLAGGED  = 0b00010000,
-		const DRAFT    = 0b00100000,
-		const DELETED  = 0b01000000,
+	pub struct Status: u8 {
+		const NEW      = 0b00000001;
+		const SEEN     = 0b00000010;
+		const OLD      = 0b00000100;
+		const ANSWERED = 0b00001000;
+		const FLAGGED  = 0b00010000;
+		const DRAFT    = 0b00100000;
+		const DELETED  = 0b01000000;
 	}
 }
 

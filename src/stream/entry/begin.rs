@@ -27,7 +27,7 @@ pub struct Begin {
 
 impl Begin {
 	#[inline]
-	pub fn ranges<T: AsRef<[u8]>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
+	pub(crate) fn ranges<T: AsRef<[u8]>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
 		let string = string.as_ref();
 
 		if let IResult::Done(_, (address, timestamp)) = parser::parse(string) {
@@ -75,19 +75,18 @@ impl Begin {
 }
 
 mod parser {
-	use nom::eof;
 	use util::parser::{is_ws, is_printable, is_printable_or_ws};
 
 	named!(pub parse(&[u8]) -> (&[u8], &[u8]),
-		chain!(
-			tag!("From ") ~
-			take_while!(is_ws) ~
-			addr: address ~
-			take_while!(is_ws) ~
-			time: timestamp ~
-			eof,
+		do_parse!(
+			tag!("From ") >>
+			take_while!(is_ws) >>
+			addr: address >>
+			take_while!(is_ws) >>
+			time: timestamp >>
+			eof!() >>
 
-			|| { (addr, time) }));
+			(addr, time)));
 
 	named!(address(&[u8]) -> &[u8],
 		take_while!(is_printable));

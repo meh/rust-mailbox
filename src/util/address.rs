@@ -29,7 +29,7 @@ pub struct Address {
 }
 
 impl Address {
-	pub fn ranges<T: AsRef<str>>(string: T) -> io::Result<(Option<Range<usize>>, Range<usize>, Option<Range<usize>>)> {
+	pub(crate) fn ranges<T: AsRef<str>>(string: T) -> io::Result<(Option<Range<usize>>, Range<usize>, Option<Range<usize>>)> {
 		let string = string.as_ref();
 
 		if let IResult::Done(_, (name, user, host)) = parser::parse(string.as_bytes()) {
@@ -54,7 +54,7 @@ impl Address {
 	}
 
 	#[inline]
-	pub fn new(string: header::Item) -> io::Result<Self> {
+	pub(crate) fn new(string: header::Item) -> io::Result<Self> {
 		let (name, user, host) = try!(Address::ranges(&string));
 
 		Ok(Address {
@@ -122,18 +122,17 @@ impl fmt::Display for Address {
 
 mod parser {
 	use std::str;
-	use nom::eof;
 	use util::parser::{WSP, is_ws};
 
 	named!(pub parse(&[u8]) -> (Option<&str>, &str, Option<&str>),
-		chain!(
-			take_while!(is_ws) ~
-			name: opt!(complete!(name)) ~
-			take_while!(is_ws) ~
-			addr: address ~
-			eof,
+		do_parse!(
+			take_while!(is_ws) >>
+			name: opt!(complete!(name)) >>
+			take_while!(is_ws) >>
+			addr: address >>
+			eof!() >>
 
-			|| unsafe {
+			(unsafe {
 				let name = name.and_then(|s| {
 					let value = str::from_utf8_unchecked(s).trim();
 
@@ -149,45 +148,45 @@ mod parser {
 				let host = addr.1.map(|s| str::from_utf8_unchecked(s));
 
 				(name, user, host)
-			}));
+			})));
 
 	named!(name(&[u8]) -> &[u8],
 		alt!(name_quoted | name_bare));
 
 	named!(name_quoted(&[u8]) -> &[u8],
-		chain!(
-			name: delimited!(char!('"'), is_not!("\""), char!('"')) ~
-			take_until!("<"),
+		do_parse!(
+			name: delimited!(char!('"'), is_not!("\""), char!('"')) >>
+			take_until!("<") >>
 
-			|| { name }));
+			(name)));
 
 	named!(name_bare(&[u8]) -> &[u8],
-		chain!(
-			take_while!(is_ws) ~
-			name: take_until!("<"),
+		do_parse!(
+			take_while!(is_ws) >>
+			name: take_until!("<") >>
 
-			|| { name }));
+			(name)));
 
 	named!(address(&[u8]) -> (&[u8], Option<&[u8]>),
 		alt!(address_quoted | address_bare | address_user_only));
 
 	named!(address_quoted(&[u8]) -> (&[u8], Option<&[u8]>),
-		chain!(
-			char!('<') ~
-			user: take_until!("@") ~
-			char!('@') ~
-			host: take_until!(">") ~
-			char!('>'),
+		do_parse!(
+			char!('<') >>
+			user: take_until!("@") >>
+			char!('@') >>
+			host: take_until!(">") >>
+			char!('>') >>
 
-			|| { (user, Some(host)) }));
+			(user, Some(host))));
 
 	named!(address_bare(&[u8]) -> (&[u8], Option<&[u8]>),
-		chain!(
-			user: take_until!("@") ~
-			char!('@') ~
-			host: take_until_either_or_eof!(WSP),
+		do_parse!(
+			user: take_until!("@") >>
+			char!('@') >>
+			host: take_until_either_or_eof!(WSP) >>
 
-			|| { (user, Some(host)) }));
+			(user, Some(host))));
 
 	named!(address_user_only(&[u8]) -> (&[u8], Option<&[u8]>),
 		map!(take_until_either_or_eof!(WSP),

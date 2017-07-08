@@ -18,9 +18,8 @@ use std::slice;
 pub struct Body(Vec<Vec<u8>>);
 
 impl Body {
-	#[doc(hidden)]
 	#[inline]
-	pub fn append(&mut self, data: Vec<u8>) {
+	pub(crate) fn append(&mut self, data: Vec<u8>) {
 		self.0.push(data);
 	}
 

@@ -10,12 +10,11 @@ repository  = "https://github.com/meh/rust-mailbox"
 keywords    = ["mail", "mbox"]
 
 [dependencies]
-lazy_static = "0.1"
-bitflags    = "0.7"
-owning_ref  = "0.2.1"
-fnv         = "1"
+bitflags   = "0.9"
+owning_ref = "0.3"
+fnv        = "1"
 
-nom    = "1.0"
+nom    = "3.0"
 casing = "0.1"
-chrono = "0.2"
-mime   = "0.2"
+chrono = "0.4"
+mime   = "0.3"

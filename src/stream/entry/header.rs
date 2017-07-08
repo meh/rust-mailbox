@@ -36,13 +36,13 @@ pub struct Header {
 pub type Item = OwningRef<Rc<String>, str>;
 
 #[inline(always)]
-pub fn item<T: Into<String>>(string: T) -> Item {
+pub(crate) fn item<T: Into<String>>(string: T) -> Item {
 	OwningRef::new(Rc::new(string.into())).map(|s| s.as_ref())
 }
 
 impl Header {
 	#[inline]
-	pub fn ranges<T: AsRef<[u8]>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
+	pub(crate) fn ranges<T: AsRef<[u8]>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
 		let string = string.as_ref();
 
 		if let IResult::Done(_, (key, value)) = parser::parse(string) {
@@ -93,18 +93,17 @@ impl Header {
 }
 
 mod parser {
-	use nom::eof;
 	use util::parser::{is_ws, is_printable_no_colon, is_printable_or_ws};
 
 	named!(pub parse(&[u8]) -> (&[u8], &[u8]),
-		chain!(
-			key: key ~
-			char!(':') ~
-			take_while!(is_ws) ~
-			value: value ~
-			eof,
+		do_parse!(
+			key: key >>
+			char!(':') >>
+			take_while!(is_ws) >>
+			value: value >>
+			eof!() >>
 
-			|| { (key, value) }));
+			(key, value)));
 
 	named!(key(&[u8]) -> &[u8],
 		take_while!(is_printable_no_colon));
