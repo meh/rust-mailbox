@@ -14,9 +14,13 @@
 
 use std::io::{self, BufRead};
 
+/// Iterator over ASCII lines.
+///
+/// The content of a line is not assumed to be in any specific encoding.
 pub struct Lines<R: BufRead>(R, u64);
 
 impl<R: BufRead> Lines<R> {
+	/// Create a new `Iterator` from the given input.
 	#[inline]
 	pub fn new(input: R) -> Self {
 		Lines(input, 0)

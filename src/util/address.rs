@@ -18,6 +18,7 @@ use std::io;
 use nom::IResult;
 use stream::entry::header;
 
+/// Represents an email address, composed of name, user and host.
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Address {
 	inner: header::Item,
@@ -65,16 +66,29 @@ impl Address {
 		})
 	}
 
+	/// The name if any.
+	///
+	/// This is the first part of an address, which can be bare or quoted, for
+	/// example `"Someone Somewhere" <someone@somewhe.re>` or `Someone Somewhere
+	/// <someone@somewhe.re>`.
 	#[inline]
 	pub fn name(&self) -> Option<&str> {
 		self.name.as_ref().map(|r| &self.inner[Range { start: r.start, end: r.end }])
 	}
 
+	/// The user.
+	///
+	/// This is the only mandatory part of an address, for instance it can be
+	/// preceded by the `name` and followed by a `@` and the host, or be the
+	/// only part of an address.
 	#[inline]
 	pub fn user(&self) -> &str {
 		&self.inner[Range { start: self.user.start, end: self.user.end }]
 	}
 
+	/// The host if any.
+	///
+	/// This is the part after the `user` preceded by a `@`.
 	#[inline]
 	pub fn host(&self) -> Option<&str> {
 		self.host.as_ref().map(|r| &self.inner[Range { start: r.start, end: r.end }])

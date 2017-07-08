@@ -20,6 +20,7 @@ use owning_ref::OwningRef;
 use nom::IResult;
 use casing::Casing;
 
+/// A header in an email.
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Header {
 	inner: Item,
@@ -28,6 +29,10 @@ pub struct Header {
 	value: Range<usize>,
 }
 
+/// A header item.
+///
+/// Note this is the same `String` that was allocated by the `stream::Lines` iterator,
+/// this means there are no allocations or copies when accessing `key()` and `value()`.
 pub type Item = OwningRef<Rc<String>, str>;
 
 #[inline(always)]
@@ -54,12 +59,14 @@ impl Header {
 		}
 	}
 
+	/// Create a new `Header` from the given `String`.
 	#[inline]
 	pub fn new<T: Into<Vec<u8>>>(string: T) -> io::Result<Self> {
 		let string       = string.into();
 		let (key, value) = try!(Header::ranges(&string));
 
 		Ok(Header {
+			// The parser verifies the content is US-ASCII, so it's safe.
 			inner: item(unsafe { String::from_utf8_unchecked(string) }),
 
 			key:   key,
@@ -67,6 +74,9 @@ impl Header {
 		})
 	}
 
+	/// The header key in the proper case.
+	///
+	/// Note that this allocates only if the key is not already in the proper case.
 	#[inline]
 	pub fn key(&self) -> Item {
 		match (&self.inner[Range { start: self.key.start, end: self.key.end }]).header(Default::default()) {
@@ -75,6 +85,7 @@ impl Header {
 		}
 	}
 
+	/// The header value.
 	#[inline]
 	pub fn value(&self) -> Item {
 		self.inner.clone().map(|s| &s[Range { start: self.value.start, end: self.value.end }])

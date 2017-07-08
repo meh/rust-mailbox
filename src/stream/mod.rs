@@ -23,11 +23,13 @@ pub use self::iter::Iter;
 
 use std::io::{Read, BufReader};
 
+/// Create an `Iterator` over line based entries.
 #[inline]
 pub fn entries<R: Read>(input: R) -> Iter<R> {
 	Iter::new(input)
 }
 
+/// Create an `Iterator` over lines.
 #[inline]
 pub fn lines<R: Read>(input: R) -> Lines<BufReader<R>> {
 	Lines::new(BufReader::new(input))

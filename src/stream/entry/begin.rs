@@ -16,6 +16,7 @@ use std::ops::Range;
 use std::io;
 use nom::IResult;
 
+/// The beginning of a new email.
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Begin {
 	inner: String,
@@ -44,12 +45,14 @@ impl Begin {
 		Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid beginning"))
 	}
 
+	/// Create a new `Begin` from the given `String`.
 	#[inline]
 	pub fn new<T: Into<Vec<u8>>>(string: T) -> io::Result<Self> {
 		let string               = string.into();
 		let (address, timestamp) = try!(Begin::ranges(&string));
 
 		Ok(Begin {
+			// The parser verifies the content is US-ASCII, so it's safe.
 			inner: unsafe { String::from_utf8_unchecked(string) },
 
 			address:   address,
@@ -57,11 +60,14 @@ impl Begin {
 		})
 	}
 
+	/// The origin address, by RFC this can be any address ever used in any
+	/// system at any time.
 	#[inline]
 	pub fn address(&self) -> &str {
 		&self.inner[Range { start: self.address.start, end: self.address.end }]
 	}
 
+	/// The timestamp.
 	#[inline]
 	pub fn timestamp(&self) -> &str {
 		&self.inner[Range { start: self.timestamp.start, end: self.timestamp.end }]

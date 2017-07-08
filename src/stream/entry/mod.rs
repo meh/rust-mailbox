@@ -12,11 +12,22 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+/// A line based entry in a mailbox.
+///
+/// Note that there are no allocations or copies from `stream::Lines`.
 #[derive(Clone, Debug)]
 pub enum Entry {
+	/// The beginning of an email, includes the absolute offset from the input
+	/// and the origin.
 	Begin(u64, Begin),
+
+	/// A header.
 	Header(Header),
+
+	/// A line of body.
 	Body(Vec<u8>),
+
+	/// The end of the email.
 	End,
 }
 

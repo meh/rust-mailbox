@@ -16,6 +16,20 @@ use std::io::{self, BufReader, Read};
 use std::iter::Peekable;
 use super::{entry, Entry, Lines};
 
+/// `Iterator` over line based entries.
+///
+/// This is a lower level building block that exposes an event like interface
+/// over the line based one.
+///
+/// It will repeat a sequence of `Entry`s in the following order:
+///
+/// - `Entry::Begin`, the beginning of an email.
+/// - `Entry::Header`, 0 or more header entries.
+/// - `Entry::Body`, 0 or more body entries.
+/// - `Entry::End`, the end of the email.
+///
+/// This is then leveraged by `mail::Iter` to expose a more ergonomic API over
+/// actual `Mail`s.
 pub struct Iter<R: Read> {
 	input: Peekable<Lines<BufReader<R>>>,
 	state: State,
@@ -29,6 +43,7 @@ enum State {
 }
 
 impl<R: Read> Iter<R> {
+	/// Create a new `Iterator` from the given input.
 	#[inline]
 	pub fn new(input: R) -> Self {
 		Iter {
