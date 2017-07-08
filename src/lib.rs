@@ -32,7 +32,7 @@ pub use header::Header;
 
 pub mod stream;
 
-mod mail;
+pub mod mail;
 pub use mail::Mail;
 
 mod iter;
