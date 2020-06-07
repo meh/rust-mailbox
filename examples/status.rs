@@ -33,27 +33,27 @@ fn main() {
 
                 status.total += 1;
 
-                if current.contains(header::status::SEEN) {
+                if current.contains(header::status::Status::SEEN) {
                     status.seen += 1;
                 }
 
-                if current.contains(header::status::OLD) {
+                if current.contains(header::status::Status::OLD) {
                     status.old += 1;
                 }
 
-                if current.contains(header::status::ANSWERED) {
+                if current.contains(header::status::Status::ANSWERED) {
                     status.answered += 1;
                 }
 
-                if current.contains(header::status::FLAGGED) {
+                if current.contains(header::status::Status::FLAGGED) {
                     status.flagged += 1;
                 }
 
-                if current.contains(header::status::DRAFT) {
+                if current.contains(header::status::Status::DRAFT) {
                     status.draft += 1;
                 }
 
-                if current.contains(header::status::DELETED) {
+                if current.contains(header::status::Status::DELETED) {
                     status.deleted += 1;
                 }
             }

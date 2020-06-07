@@ -40,13 +40,13 @@ impl Header for Status {
 
         for ch in values[0].chars() {
             status |= match ch {
-                'N' => NEW,
-                'R' => SEEN,
-                'O' => OLD,
-                'A' => ANSWERED,
-                'F' => FLAGGED,
-                'T' => DRAFT,
-                'D' => DELETED,
+                'N' => Status::NEW,
+                'R' => Status::SEEN,
+                'O' => Status::OLD,
+                'A' => Status::ANSWERED,
+                'F' => Status::FLAGGED,
+                'T' => Status::DRAFT,
+                'D' => Status::DELETED,
 
                 _ => {
                     return Err(io::Error::new(
@@ -75,43 +75,43 @@ mod test {
 
     #[test]
     fn new() {
-        assert_eq!(parse!("N").unwrap(), NEW);
+        assert_eq!(parse!("N").unwrap(), Status::NEW);
     }
 
     #[test]
     fn read() {
-        assert_eq!(parse!("R").unwrap(), SEEN);
+        assert_eq!(parse!("R").unwrap(), Status::SEEN);
     }
 
     #[test]
     fn old() {
-        assert_eq!(parse!("O").unwrap(), OLD);
+        assert_eq!(parse!("O").unwrap(), Status::OLD);
     }
 
     #[test]
     fn answered() {
-        assert_eq!(parse!("A").unwrap(), ANSWERED);
+        assert_eq!(parse!("A").unwrap(), Status::ANSWERED);
     }
 
     #[test]
     fn flagged() {
-        assert_eq!(parse!("F").unwrap(), FLAGGED);
+        assert_eq!(parse!("F").unwrap(), Status::FLAGGED);
     }
 
     #[test]
     fn draft() {
-        assert_eq!(parse!("T").unwrap(), DRAFT);
+        assert_eq!(parse!("T").unwrap(), Status::DRAFT);
     }
 
     #[test]
     fn deleted() {
-        assert_eq!(parse!("D").unwrap(), DELETED);
+        assert_eq!(parse!("D").unwrap(), Status::DELETED);
     }
 
     #[test]
     fn mixed() {
-        assert_eq!(parse!("ROD").unwrap(), SEEN | OLD | DELETED);
-        assert_eq!(parse!("FTA").unwrap(), FLAGGED | DRAFT | ANSWERED);
+        assert_eq!(parse!("ROD").unwrap(), Status::SEEN | Status::OLD | Status::DELETED);
+        assert_eq!(parse!("FTA").unwrap(), Status::FLAGGED | Status::DRAFT | Status::ANSWERED);
     }
 
     #[test]

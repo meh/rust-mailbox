@@ -12,7 +12,7 @@ keywords    = ["mail", "mbox"]
 edition = "2018"
 
 [dependencies]
-bitflags   = "0.9"
+bitflags   = "1.0"
 owning_ref = "0.3"
 fnv        = "1"
 
