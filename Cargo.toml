@@ -9,6 +9,8 @@ description = "MBOX reader."
 repository  = "https://github.com/meh/rust-mailbox"
 keywords    = ["mail", "mbox"]
 
+edition = "2018"
+
 [dependencies]
 bitflags   = "0.9"
 owning_ref = "0.3"
