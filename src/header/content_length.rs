@@ -12,32 +12,33 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use super::Header;
+use crate::stream::entry::header;
 use std::io;
 use std::ops::Deref;
-use crate::stream::entry::header;
-use super::Header;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct ContentLength(pub usize);
 
 impl Header for ContentLength {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"Content-Length"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "Content-Length"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(ContentLength(r#try!(values[0].parse().map_err(|_|
-			io::Error::new(io::ErrorKind::InvalidInput, "invalid content length")))))
-	}
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        Ok(ContentLength(r#try!(values[0].parse().map_err(|_| {
+            io::Error::new(io::ErrorKind::InvalidInput, "invalid content length")
+        }))))
+    }
 }
 
 impl Deref for ContentLength {
-	type Target = usize;
+    type Target = usize;
 
-	#[inline]
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }

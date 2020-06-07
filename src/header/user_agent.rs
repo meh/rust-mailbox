@@ -12,30 +12,30 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use super::Header;
+use crate::stream::entry::header;
 use std::io;
 use std::ops::Deref;
-use crate::stream::entry::header;
-use super::Header;
 
 pub struct UserAgent(header::Item);
 
 impl Header for UserAgent {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"User-Agent"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "User-Agent"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(UserAgent(values[0].clone()))
-	}
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        Ok(UserAgent(values[0].clone()))
+    }
 }
 
 impl Deref for UserAgent {
-	type Target = str;
+    type Target = str;
 
-	#[inline]
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }

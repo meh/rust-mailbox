@@ -12,30 +12,30 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use super::Header;
+use crate::stream::entry::header;
 use std::io;
 use std::ops::Deref;
-use crate::stream::entry::header;
-use super::Header;
 
 pub struct Subject(header::Item);
 
 impl Header for Subject {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"Subject"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "Subject"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(Subject(values[0].clone()))
-	}
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        Ok(Subject(values[0].clone()))
+    }
 }
 
 impl Deref for Subject {
-	type Target = str;
+    type Target = str;
 
-	#[inline]
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }

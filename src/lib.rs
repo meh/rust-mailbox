@@ -14,8 +14,8 @@
 
 #[macro_use]
 extern crate bitflags;
-extern crate owning_ref;
 extern crate fnv;
+extern crate owning_ref;
 
 #[macro_use]
 extern crate nom;
@@ -42,5 +42,5 @@ use std::io::Read;
 
 #[inline]
 pub fn read<R: Read>(input: R) -> Iter<R> {
-	Iter::new(input)
+    Iter::new(input)
 }

@@ -12,12 +12,12 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-use std::io;
 use crate::stream::entry::header;
+use std::io;
 
 pub trait Header: Sized {
-	fn name() -> &'static str;
-	fn parse(entries: &[header::Item]) -> io::Result<Self>;
+    fn name() -> &'static str;
+    fn parse(entries: &[header::Item]) -> io::Result<Self>;
 }
 
 pub mod status;

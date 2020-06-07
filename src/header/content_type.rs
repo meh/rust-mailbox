@@ -12,33 +12,34 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use super::Header;
+use crate::stream::entry::header;
+use mime::Mime;
 use std::io;
 use std::ops::Deref;
-use mime::Mime;
-use crate::stream::entry::header;
-use super::Header;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct ContentType(Mime);
 
 impl Header for ContentType {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"Content-Type"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "Content-Type"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(ContentType(r#try!(values[0].parse().map_err(|_|
-			io::Error::new(io::ErrorKind::InvalidInput, "invalid MIME type")))))
-	}
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        Ok(ContentType(r#try!(values[0].parse().map_err(|_| {
+            io::Error::new(io::ErrorKind::InvalidInput, "invalid MIME type")
+        }))))
+    }
 }
 
 impl Deref for ContentType {
-	type Target = Mime;
+    type Target = Mime;
 
-	#[inline]
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }

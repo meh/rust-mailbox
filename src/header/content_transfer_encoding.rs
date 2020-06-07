@@ -12,67 +12,73 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-use std::io;
-use crate::stream::entry::header;
 use super::Header;
+use crate::stream::entry::header;
 use casing::Casing;
+use std::io;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub enum ContentTransferEncoding {
-	Ascii,
-	ExtendedAscii,
-	Binary,
-	QuotedPrintable,
-	Base64,
-	Token(String),
+    Ascii,
+    ExtendedAscii,
+    Binary,
+    QuotedPrintable,
+    Base64,
+    Token(String),
 }
 
 impl Header for ContentTransferEncoding {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"Content-Transfer-Encoding"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "Content-Transfer-Encoding"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(match values[0].lower(Default::default()).as_ref() {
-			"7bit"             => ContentTransferEncoding::Ascii,
-			"8bit"             => ContentTransferEncoding::ExtendedAscii,
-			"binary"           => ContentTransferEncoding::Binary,
-			"quoted-printable" => ContentTransferEncoding::QuotedPrintable,
-			"base64"           => ContentTransferEncoding::Base64,
-			token              => ContentTransferEncoding::Token(token.into()),
-		})
-	}
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        Ok(match values[0].lower(Default::default()).as_ref() {
+            "7bit" => ContentTransferEncoding::Ascii,
+            "8bit" => ContentTransferEncoding::ExtendedAscii,
+            "binary" => ContentTransferEncoding::Binary,
+            "quoted-printable" => ContentTransferEncoding::QuotedPrintable,
+            "base64" => ContentTransferEncoding::Base64,
+            token => ContentTransferEncoding::Token(token.into()),
+        })
+    }
 }
 
 #[cfg(test)]
 mod test {
-	use super::*;
-	use crate::stream::entry::header;
-	use crate::header::Header;
+    use super::*;
+    use crate::header::Header;
+    use crate::stream::entry::header;
 
-	macro_rules! parse {
-		($str:expr) => (
-			<ContentTransferEncoding as Header>::parse(&[header::item($str)])
-		);
-	}
+    macro_rules! parse {
+        ($str:expr) => {
+            <ContentTransferEncoding as Header>::parse(&[header::item($str)])
+        };
+    }
 
-	#[test]
-	fn insensitive() {
-		assert_eq!(parse!("7Bit").unwrap(), ContentTransferEncoding::Ascii);
-		assert_eq!(parse!("bAsE64").unwrap(), ContentTransferEncoding::Base64);
-	}
+    #[test]
+    fn insensitive() {
+        assert_eq!(parse!("7Bit").unwrap(), ContentTransferEncoding::Ascii);
+        assert_eq!(parse!("bAsE64").unwrap(), ContentTransferEncoding::Base64);
+    }
 
-	#[test]
-	fn ascii() {
-		assert_eq!(parse!("7BiT").unwrap(), ContentTransferEncoding::Ascii);
-		assert_eq!(parse!("7bit").unwrap(), ContentTransferEncoding::Ascii);
-	}
+    #[test]
+    fn ascii() {
+        assert_eq!(parse!("7BiT").unwrap(), ContentTransferEncoding::Ascii);
+        assert_eq!(parse!("7bit").unwrap(), ContentTransferEncoding::Ascii);
+    }
 
-	#[test]
-	fn extended_ascii() {
-		assert_eq!(parse!("8BiT").unwrap(), ContentTransferEncoding::ExtendedAscii);
-		assert_eq!(parse!("8bit").unwrap(), ContentTransferEncoding::ExtendedAscii);
-	}
+    #[test]
+    fn extended_ascii() {
+        assert_eq!(
+            parse!("8BiT").unwrap(),
+            ContentTransferEncoding::ExtendedAscii
+        );
+        assert_eq!(
+            parse!("8bit").unwrap(),
+            ContentTransferEncoding::ExtendedAscii
+        );
+    }
 }

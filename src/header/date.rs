@@ -12,34 +12,37 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use super::Header;
+use crate::stream::entry::header;
+use chrono::{DateTime, FixedOffset};
 use std::io;
 use std::ops::Deref;
-use chrono::{DateTime, FixedOffset};
-use crate::stream::entry::header;
-use super::Header;
 
 #[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Debug)]
 pub struct Date(DateTime<FixedOffset>);
 
 impl Header for Date {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"Date"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "Date"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(r#try!(DateTime::parse_from_rfc2822(values[0].as_ref())
-			.map(Date)
-			.map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid date"))))
-	}
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        Ok(r#try!(DateTime::parse_from_rfc2822(values[0].as_ref())
+            .map(Date)
+            .map_err(|_| io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "invalid date"
+            ))))
+    }
 }
 
 impl Deref for Date {
-	type Target = DateTime<FixedOffset>;
+    type Target = DateTime<FixedOffset>;
 
-	#[inline]
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
