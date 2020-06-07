@@ -63,7 +63,7 @@ impl Header {
 	#[inline]
 	pub fn new<T: Into<Vec<u8>>>(string: T) -> io::Result<Self> {
 		let string       = string.into();
-		let (key, value) = try!(Header::ranges(&string));
+		let (key, value) = r#try!(Header::ranges(&string));
 
 		Ok(Header {
 			// The parser verifies the content is US-ASCII, so it's safe.
@@ -93,7 +93,7 @@ impl Header {
 }
 
 mod parser {
-	use util::parser::{is_ws, is_printable_no_colon, is_printable_or_ws};
+	use crate::util::parser::{is_ws, is_printable_no_colon, is_printable_or_ws};
 
 	named!(pub parse(&[u8]) -> (&[u8], &[u8]),
 		do_parse!(

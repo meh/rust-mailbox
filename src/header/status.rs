@@ -13,7 +13,7 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
-use stream::entry::header;
+use crate::stream::entry::header;
 use super::Header;
 
 bitflags! {
@@ -60,8 +60,8 @@ impl Header for Status {
 #[cfg(test)]
 mod test {
 	use super::*;
-	use stream::entry::header;
-	use header::Header;
+	use crate::stream::entry::header;
+	use crate::header::Header;
 
 	macro_rules! parse {
 		($str:expr) => (

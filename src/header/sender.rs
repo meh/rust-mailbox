@@ -14,8 +14,8 @@
 
 use std::io;
 use std::ops::Deref;
-use stream::entry::header;
-use util::Address;
+use crate::stream::entry::header;
+use crate::util::Address;
 use super::Header;
 
 pub struct Sender(Address);
@@ -28,7 +28,7 @@ impl Header for Sender {
 
 	#[inline]
 	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(Sender(try!(Address::new(values[0].clone()))))
+		Ok(Sender(r#try!(Address::new(values[0].clone()))))
 	}
 }
 

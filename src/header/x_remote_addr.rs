@@ -15,7 +15,7 @@
 use std::io;
 use std::ops::Deref;
 use std::net::IpAddr;
-use stream::entry::header;
+use crate::stream::entry::header;
 use super::Header;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
@@ -29,7 +29,7 @@ impl Header for XRemoteAddr {
 
 	#[inline]
 	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(XRemoteAddr(try!(values[0].parse().map_err(|_|
+		Ok(XRemoteAddr(r#try!(values[0].parse().map_err(|_|
 			io::Error::new(io::ErrorKind::InvalidInput, "invalid IP address")))))
 	}
 }

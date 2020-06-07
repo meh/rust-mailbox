@@ -17,8 +17,8 @@ use std::hash::BuildHasherDefault;
 use std::io;
 use fnv::FnvHasher;
 use casing::Casing;
-use header::Header;
-use stream::entry::{self, header};
+use crate::header::Header;
+use crate::stream::entry::{self, header};
 
 #[derive(Clone, Default, Debug)]
 pub struct Headers(HashMap<header::Item, Vec<header::Item>, BuildHasherDefault<FnvHasher>>);

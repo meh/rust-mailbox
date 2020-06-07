@@ -15,7 +15,7 @@
 use std::io;
 use std::ops::Deref;
 use chrono::{DateTime, FixedOffset};
-use stream::entry::header;
+use crate::stream::entry::header;
 use super::Header;
 
 #[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Debug)]
@@ -29,7 +29,7 @@ impl Header for Date {
 
 	#[inline]
 	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(try!(DateTime::parse_from_rfc2822(values[0].as_ref())
+		Ok(r#try!(DateTime::parse_from_rfc2822(values[0].as_ref())
 			.map(Date)
 			.map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid date"))))
 	}

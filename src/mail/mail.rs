@@ -12,7 +12,7 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-use stream;
+use crate::stream;
 use super::{Headers, Body};
 
 #[derive(Clone, Debug)]

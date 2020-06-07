@@ -14,7 +14,7 @@
 
 use std::io;
 use std::ops::Deref;
-use stream::entry::header;
+use crate::stream::entry::header;
 use super::Header;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
@@ -28,7 +28,7 @@ impl Header for Lines {
 
 	#[inline]
 	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(Lines(try!(values[0].parse().map_err(|_|
+		Ok(Lines(r#try!(values[0].parse().map_err(|_|
 			io::Error::new(io::ErrorKind::InvalidInput, "invalid lines")))))
 	}
 }

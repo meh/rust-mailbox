@@ -49,7 +49,7 @@ impl Begin {
 	#[inline]
 	pub fn new<T: Into<Vec<u8>>>(string: T) -> io::Result<Self> {
 		let string               = string.into();
-		let (address, timestamp) = try!(Begin::ranges(&string));
+		let (address, timestamp) = r#try!(Begin::ranges(&string));
 
 		Ok(Begin {
 			// The parser verifies the content is US-ASCII, so it's safe.
@@ -75,7 +75,7 @@ impl Begin {
 }
 
 mod parser {
-	use util::parser::{is_ws, is_printable, is_printable_or_ws};
+	use crate::util::parser::{is_ws, is_printable, is_printable_or_ws};
 
 	named!(pub parse(&[u8]) -> (&[u8], &[u8]),
 		do_parse!(

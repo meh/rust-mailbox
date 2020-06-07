@@ -16,7 +16,7 @@ use std::fmt::{self, Write};
 use std::ops::Range;
 use std::io;
 use nom::IResult;
-use stream::entry::header;
+use crate::stream::entry::header;
 
 /// Represents an email address, composed of name, user and host.
 #[derive(Eq, PartialEq, Clone, Debug)]
@@ -55,7 +55,7 @@ impl Address {
 
 	#[inline]
 	pub(crate) fn new(string: header::Item) -> io::Result<Self> {
-		let (name, user, host) = try!(Address::ranges(&string));
+		let (name, user, host) = r#try!(Address::ranges(&string));
 
 		Ok(Address {
 			inner: string,
@@ -98,22 +98,22 @@ impl Address {
 impl fmt::Display for Address {
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		if let Some(name) = self.name() {
-			try!(f.write_char('"'));
-			try!(f.write_str(name));
-			try!(f.write_char('"'));
-			try!(f.write_char(' '));
-			try!(f.write_char('<'));
+			r#try!(f.write_char('"'));
+			r#try!(f.write_str(name));
+			r#try!(f.write_char('"'));
+			r#try!(f.write_char(' '));
+			r#try!(f.write_char('<'));
 		}
 
-		try!(f.write_str(&self.user()));
+		r#try!(f.write_str(&self.user()));
 
 		if let Some(host) = self.host() {
-			try!(f.write_char('@'));
-			try!(f.write_str(host));
+			r#try!(f.write_char('@'));
+			r#try!(f.write_str(host));
 		}
 
 		if self.name().is_some() {
-			try!(f.write_char('>'));
+			r#try!(f.write_char('>'));
 		}
 
 		Ok(())
@@ -122,7 +122,7 @@ impl fmt::Display for Address {
 
 mod parser {
 	use std::str;
-	use util::parser::{WSP, is_ws};
+	use crate::util::parser::{WSP, is_ws};
 
 	named!(pub parse(&[u8]) -> (Option<&str>, &str, Option<&str>),
 		do_parse!(

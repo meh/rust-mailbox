@@ -14,8 +14,8 @@
 
 use std::io;
 use std::ops::Deref;
-use stream::entry::header;
-use util::Address;
+use crate::stream::entry::header;
+use crate::util::Address;
 use super::Header;
 
 pub struct Bcc(Vec<Address>);
@@ -35,7 +35,7 @@ impl Header for Bcc {
 			let start = slice.as_ptr() as usize - string.as_ptr() as usize;
 			let end   = start + slice.len();
 
-			to.push(try!(Address::new(string.clone().map(|s| &s[start..end]))));
+			to.push(r#try!(Address::new(string.clone().map(|s| &s[start..end]))));
 		}
 
 		Ok(Bcc(to))

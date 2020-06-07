@@ -25,18 +25,18 @@ extern crate mime;
 
 #[macro_use]
 mod util;
-pub use util::Address;
+pub use crate::util::Address;
 
 pub mod header;
-pub use header::Header;
+pub use crate::header::Header;
 
 pub mod stream;
 
 pub mod mail;
-pub use mail::Mail;
+pub use crate::mail::Mail;
 
 mod iter;
-pub use iter::Iter;
+pub use crate::iter::Iter;
 
 use std::io::Read;
 

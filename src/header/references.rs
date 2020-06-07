@@ -14,8 +14,8 @@
 
 use std::io;
 use std::ops::Deref;
-use stream::entry::header;
-use util::Address;
+use crate::stream::entry::header;
+use crate::util::Address;
 use super::{Header, MessageId};
 
 pub struct References(Vec<MessageId>);
@@ -35,7 +35,7 @@ impl Header for References {
 			let start = slice.as_ptr() as usize - string.as_ptr() as usize;
 			let end   = start + slice.len();
 
-			ids.push(MessageId(try!(Address::new(string.clone().map(|s| &s[start..end])))));
+			ids.push(MessageId(r#try!(Address::new(string.clone().map(|s| &s[start..end])))));
 		}
 
 		Ok(References(ids))

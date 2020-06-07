@@ -13,8 +13,8 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
-use stream::entry::header;
-use util::Address;
+use crate::stream::entry::header;
+use crate::util::Address;
 use super::Header;
 
 pub struct MessageId(pub Address);
@@ -27,7 +27,7 @@ impl Header for MessageId {
 
 	#[inline]
 	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		let address = try!(Address::new(values[0].clone()));
+		let address = r#try!(Address::new(values[0].clone()));
 
 		if address.host().is_none() {
 			return Err(io::Error::new(io::ErrorKind::InvalidInput, "missing host"));

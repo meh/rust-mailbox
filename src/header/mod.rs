@@ -13,7 +13,7 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use std::io;
-use stream::entry::header;
+use crate::stream::entry::header;
 
 pub trait Header: Sized {
 	fn name() -> &'static str;

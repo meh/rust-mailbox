@@ -14,7 +14,7 @@
 
 use std::io;
 use std::ops::Deref;
-use stream::entry::header;
+use crate::stream::entry::header;
 use super::Header;
 
 pub struct UserAgent(header::Item);
