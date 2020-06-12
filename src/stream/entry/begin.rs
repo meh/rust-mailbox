@@ -12,7 +12,6 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-use nom::IResult;
 use std::io;
 use std::ops::Range;
 
@@ -30,7 +29,7 @@ impl Begin {
     pub(crate) fn ranges<T: AsRef<[u8]>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
         let string = string.as_ref();
 
-        if let IResult::Done(_, (address, timestamp)) = parser::parse(string) {
+        if let Ok((_, (address, timestamp))) = parser::parse(string) {
             if timestamp.len() == 24 {
                 let a = address.as_ptr() as usize - string.as_ptr() as usize;
                 let t = timestamp.as_ptr() as usize - string.as_ptr() as usize;
@@ -99,7 +98,6 @@ mod parser {
 			addr: address >>
 			take_while!(is_ws) >>
 			time: timestamp >>
-			eof!() >>
 
 			(addr, time)));
 

@@ -13,7 +13,6 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use casing::Casing;
-use nom::IResult;
 use owning_ref::OwningRef;
 use std::borrow::Cow;
 use std::io;
@@ -45,7 +44,7 @@ impl Header {
     pub(crate) fn ranges<T: AsRef<[u8]>>(string: T) -> io::Result<(Range<usize>, Range<usize>)> {
         let string = string.as_ref();
 
-        if let IResult::Done(_, (key, value)) = parser::parse(string) {
+        if let Ok((_, (key, value))) = parser::parse(string) {
             let k = key.as_ptr() as usize - string.as_ptr() as usize;
             let v = value.as_ptr() as usize - string.as_ptr() as usize;
 
@@ -117,22 +116,30 @@ impl Header {
 
 mod parser {
     use crate::util::parser::{is_printable_no_colon, is_printable_or_ws, is_ws};
+    use nom::bytes::complete::take_while;
+    use nom::character::complete::char;
+    use nom::sequence::tuple;
+    use nom::IResult;
 
-    named!(pub parse(&[u8]) -> (&[u8], &[u8]),
-		do_parse!(
-			key: key >>
-			char!(':') >>
-			take_while!(is_ws) >>
-			value: value >>
-			eof!() >>
+    pub fn parse(input: &[u8]) -> IResult<&[u8], (&[u8], &[u8])> {
+        let (input, (key, _, _, value)) = tuple(
+            (
+                key,
+                char(':'),
+                take_while(is_ws),
+                value,
+            )
+        )(input)?;
+        Ok((input, (key, value)))
+    }
 
-			(key, value)));
+    pub fn key(input: &[u8]) -> IResult<&[u8], &[u8]> {
+        take_while(is_printable_no_colon)(input)
+    }
 
-    named!(key(&[u8]) -> &[u8],
-		take_while!(is_printable_no_colon));
-
-    named!(value(&[u8]) -> &[u8],
-		take_while!(is_printable_or_ws));
+    pub fn value(input: &[u8]) -> IResult<&[u8], &[u8]> {
+        take_while(is_printable_or_ws)(input)
+    }
 }
 
 #[cfg(test)]

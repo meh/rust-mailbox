@@ -299,77 +299,28 @@ pub fn is_printable_no_colon(ch: u8) -> bool {
     unsafe { ASCII.get_unchecked(ch as usize) & (PRINT | COLON) == PRINT }
 }
 
-macro_rules! take_until_either_or_eof {
-    ($i:expr, $inp:expr) => {{
-        #[inline(always)]
-        fn as_bytes<T: $crate::nom::AsBytes>(b: &T) -> &[u8] {
-            b.as_bytes()
-        }
-
-        let expected = $inp;
-        let bytes = as_bytes(&expected);
-        take_until_either_bytes_or_eof!($i, bytes)
-    }};
-}
-
-macro_rules! take_until_either_bytes_or_eof {
-    ($i:expr, $bytes:expr) => {{
-        let res: $crate::nom::IResult<_, _> = if 1 > $i.len() {
-            $crate::nom::IResult::Incomplete($crate::nom::Needed::Size(1))
-        } else {
-            let mut index = 0;
-            let mut parsed = false;
-
-            for idx in 0..$i.len() {
-                if idx + 1 > $i.len() {
-                    index = idx;
-                    break;
-                }
-                for &t in $bytes.iter() {
-                    if $i[idx] == t {
-                        parsed = true;
-                        index = idx;
-                        break;
-                    }
-                }
-                if parsed {
-                    break;
-                }
-            }
-
-            if parsed {
-                $crate::nom::IResult::Done(&$i[index..], &$i[0..index])
-            } else {
-                $crate::nom::IResult::Done(b"", &$i[..])
-            }
-        };
-
-        res
-    }};
-}
-
 macro_rules! take_while_n {
 	($input:expr, $n:expr, $submac:ident!( $($args:tt)* )) => ({
 		let count = $n;
 
 		if $input.len() < count {
-			return $crate::nom::IResult::Incomplete($crate::nom::Needed::Size(count));
+			return Err($crate::nom::Err::Incomplete($crate::nom::Needed::Size(count)));
 		}
 
 		match $input.iter().take(count).position(|c| !$submac!(*c, $($args)*)) {
 			Some(n) => {
 				let res:$crate::nom::IResult<_,_> = if n == count {
-					$crate::nom::IResult::Done(&$input[n..], &$input[..n])
+					Ok((&$input[n..], &$input[..n]))
 				}
 				else {
-					$crate::nom::IResult::Error($crate::nom::ErrorKind::Tag)
+					Err($crate::nom::Err::Error(error_position!(&$input[n..], $crate::nom::error::ErrorKind::Tag)))
 				};
 
 				res
 			},
 
 			None => {
-				$crate::nom::IResult::Done(&$input[($input).len()..], $input)
+				Ok((&$input[($input).len()..], $input))
 			}
 		}
 	});

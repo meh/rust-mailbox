@@ -16,7 +16,7 @@ bitflags   = "1.0"
 owning_ref = "0.4"
 fnv        = "1"
 
-nom    = "3.0"
+nom    = "5.0"
 casing = "0.1"
 chrono = "0.4"
 mime   = "0.3"
