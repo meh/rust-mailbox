@@ -76,8 +76,8 @@ impl Header {
             // The parser verifies the content is US-ASCII, so it's safe.
             inner: item(unsafe { String::from_utf8_unchecked(string) }),
 
-            key: key,
-            value: value,
+            key,
+            value,
         })
     }
 

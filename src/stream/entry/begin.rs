@@ -63,8 +63,8 @@ impl Begin {
             // The parser verifies the content is US-ASCII, so it's safe.
             inner: unsafe { String::from_utf8_unchecked(string) },
 
-            address: address,
-            timestamp: timestamp,
+            address,
+            timestamp,
         })
     }
 

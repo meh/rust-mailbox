@@ -128,10 +128,7 @@ impl<'a> Iterator for Iter<'a> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some((key, values)) = self.0.next() {
-            Some(HeaderView {
-                key: key,
-                values: values,
-            })
+            Some(HeaderView {key, values})
         } else {
             None
         }
