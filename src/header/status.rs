@@ -110,8 +110,14 @@ mod test {
 
     #[test]
     fn mixed() {
-        assert_eq!(parse!("ROD").unwrap(), Status::SEEN | Status::OLD | Status::DELETED);
-        assert_eq!(parse!("FTA").unwrap(), Status::FLAGGED | Status::DRAFT | Status::ANSWERED);
+        assert_eq!(
+            parse!("ROD").unwrap(),
+            Status::SEEN | Status::OLD | Status::DELETED
+        );
+        assert_eq!(
+            parse!("FTA").unwrap(),
+            Status::FLAGGED | Status::DRAFT | Status::ANSWERED
+        );
     }
 
     #[test]

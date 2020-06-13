@@ -32,7 +32,7 @@ impl Address {
         string: T,
     ) -> io::Result<(Option<Range<usize>>, Range<usize>, Option<Range<usize>>)> {
         let string = string.as_ref();
-        
+
         if let Ok((_, (name, user, host))) = parser::parse(string.as_bytes()) {
             let n = name.map(|n| n.as_ptr() as usize - string.as_ptr() as usize);
             let u = user.as_ptr() as usize - string.as_ptr() as usize;
@@ -147,23 +147,21 @@ impl fmt::Display for Address {
 
 mod parser {
     use crate::util::parser::{is_ws, WSP};
-    use nom::sequence::{delimited, tuple};
-    use nom::branch::{alt};
-    use nom::bytes::complete::{is_not, take_while, take_until, take_till};
-    use nom::character::complete::{char};
+    use nom::branch::alt;
+    use nom::bytes::complete::{is_not, take_till, take_until, take_while};
+    use nom::character::complete::char;
     use nom::combinator::{complete, map, opt};
+    use nom::sequence::{delimited, tuple};
     use nom::IResult;
     use std::str;
 
     pub fn parse(input: &[u8]) -> IResult<&[u8], (Option<&str>, &str, Option<&str>)> {
-        let (input, (_, name, _, address)) =
-            tuple((
-                take_while(is_ws),
-                opt(complete(name)),
-                take_while(is_ws),
-                address,
-            )
-        )(input)?;
+        let (input, (_, name, _, address)) = tuple((
+            take_while(is_ws),
+            opt(complete(name)),
+            take_while(is_ws),
+            address,
+        ))(input)?;
 
         let name = name.and_then(|s| {
             let value = str::from_utf8(s).unwrap().trim();
@@ -202,8 +200,13 @@ mod parser {
     }
 
     pub fn address_quoted(input: &[u8]) -> IResult<&[u8], (&[u8], Option<&[u8]>)> {
-        let (input, (_, user, _, host, _)) =
-            tuple((char('<'), take_until("@"), char('@'), take_until(">"), char('>')))(input)?;
+        let (input, (_, user, _, host, _)) = tuple((
+            char('<'),
+            take_until("@"),
+            char('@'),
+            take_until(">"),
+            char('>'),
+        ))(input)?;
         Ok((input, (user, Some(host))))
     }
 

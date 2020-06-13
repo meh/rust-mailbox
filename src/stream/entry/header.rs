@@ -122,14 +122,7 @@ mod parser {
     use nom::IResult;
 
     pub fn parse(input: &[u8]) -> IResult<&[u8], (&[u8], &[u8])> {
-        let (input, (key, _, _, value)) = tuple(
-            (
-                key,
-                char(':'),
-                take_while(is_ws),
-                value,
-            )
-        )(input)?;
+        let (input, (key, _, _, value)) = tuple((key, char(':'), take_while(is_ws), value))(input)?;
         Ok((input, (key, value)))
     }
 
