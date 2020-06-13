@@ -28,7 +28,7 @@ impl Header for DeliveredTo {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(DeliveredTo(r#try!(Address::new(values[0].clone()))))
+        Ok(DeliveredTo(Address::new(values[0].clone())?))
     }
 }
 

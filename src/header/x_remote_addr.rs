@@ -29,9 +29,9 @@ impl Header for XRemoteAddr {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(XRemoteAddr(r#try!(values[0].parse().map_err(|_| {
+        Ok(XRemoteAddr(values[0].parse().map_err(|_| {
             io::Error::new(io::ErrorKind::InvalidInput, "invalid IP address")
-        }))))
+        })?))
     }
 }
 

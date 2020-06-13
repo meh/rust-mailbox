@@ -28,7 +28,7 @@ impl Header for Sender {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(Sender(r#try!(Address::new(values[0].clone()))))
+        Ok(Sender(Address::new(values[0].clone())?))
     }
 }
 

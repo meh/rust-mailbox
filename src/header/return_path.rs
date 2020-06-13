@@ -28,7 +28,7 @@ impl Header for ReturnPath {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(ReturnPath(r#try!(Address::new(values[0].clone()))))
+        Ok(ReturnPath(Address::new(values[0].clone())?))
     }
 }
 

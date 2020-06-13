@@ -29,9 +29,9 @@ impl Header for ContentType {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(ContentType(r#try!(values[0].parse().map_err(|_| {
+        Ok(ContentType(values[0].parse().map_err(|_| {
             io::Error::new(io::ErrorKind::InvalidInput, "invalid MIME type")
-        }))))
+        })?))
     }
 }
 

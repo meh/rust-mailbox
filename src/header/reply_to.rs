@@ -28,7 +28,7 @@ impl Header for ReplyTo {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(ReplyTo(r#try!(Address::new(values[0].clone()))))
+        Ok(ReplyTo(Address::new(values[0].clone())?))
     }
 }
 

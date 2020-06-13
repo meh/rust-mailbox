@@ -28,7 +28,7 @@ impl Header for From {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(From(r#try!(Address::new(values[0].clone()))))
+        Ok(From(Address::new(values[0].clone())?))
     }
 }
 

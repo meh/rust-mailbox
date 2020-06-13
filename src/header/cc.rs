@@ -35,7 +35,7 @@ impl Header for Cc {
             let start = slice.as_ptr() as usize - string.as_ptr() as usize;
             let end = start + slice.len();
 
-            to.push(r#try!(Address::new(string.clone().map(|s| &s[start..end]))));
+            to.push(Address::new(string.clone().map(|s| &s[start..end]))?);
         }
 
         Ok(Cc(to))

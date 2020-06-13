@@ -67,7 +67,7 @@ impl Address {
 
     #[inline]
     pub(crate) fn new(string: header::Item) -> io::Result<Self> {
-        let (name, user, host) = r#try!(Address::ranges(&string));
+        let (name, user, host) = Address::ranges(&string)?;
 
         Ok(Address {
             inner: string,
@@ -123,22 +123,22 @@ impl Address {
 impl fmt::Display for Address {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         if let Some(name) = self.name() {
-            r#try!(f.write_char('"'));
-            r#try!(f.write_str(name));
-            r#try!(f.write_char('"'));
-            r#try!(f.write_char(' '));
-            r#try!(f.write_char('<'));
+            f.write_char('"')?;
+            f.write_str(name)?;
+            f.write_char('"')?;
+            f.write_char(' ')?;
+            f.write_char('<')?;
         }
 
-        r#try!(f.write_str(&self.user()));
+        f.write_str(&self.user())?;
 
         if let Some(host) = self.host() {
-            r#try!(f.write_char('@'));
-            r#try!(f.write_str(host));
+            f.write_char('@')?;
+            f.write_str(host)?;
         }
 
         if self.name().is_some() {
-            r#try!(f.write_char('>'));
+            f.write_char('>')?;
         }
 
         Ok(())

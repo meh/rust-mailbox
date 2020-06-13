@@ -72,16 +72,6 @@ impl<R: Read> Iterator for Iter<R> {
             };
         }
 
-        macro_rules! r#try {
-            ($body:expr) => {
-                match $body {
-                    Ok(value) => value,
-
-                    Err(err) => return Some(Err(err.into())),
-                }
-            };
-        }
-
         macro_rules! utf8 {
             ($body:expr) => {
                 match $body {
@@ -98,12 +88,12 @@ impl<R: Read> Iterator for Iter<R> {
         }
 
         loop {
-            let (offset, line) = r#try!(eof!(self.input.next()));
+            let (offset, line) = eof!(self.input.next()).ok()?;
 
             match self.state {
                 State::Begin => {
                     // Parse the beginning and return any errors.
-                    let value = r#try!(entry::Begin::new(utf8!(String::from_utf8(line))));
+                    let value = entry::Begin::new(utf8!(String::from_utf8(line))).ok()?;
                     self.state = State::Header;
 
                     return Some(Ok(Entry::Begin(offset, value)));
@@ -146,7 +136,7 @@ impl<R: Read> Iterator for Iter<R> {
                     }
 
                     // Parse the header and return any errors.
-                    return Some(Ok(Entry::Header(r#try!(entry::Header::new(line)))));
+                    return Some(Ok(Entry::Header(entry::Header::new(line).ok()?)));
                 }
 
                 State::Body => {

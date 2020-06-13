@@ -28,7 +28,7 @@ impl Header for XEnvelopeFrom {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(XEnvelopeFrom(r#try!(Address::new(values[0].clone()))))
+        Ok(XEnvelopeFrom(Address::new(values[0].clone())?))
     }
 }
 

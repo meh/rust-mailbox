@@ -28,9 +28,9 @@ impl Header for ContentLength {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(ContentLength(r#try!(values[0].parse().map_err(|_| {
+        Ok(ContentLength(values[0].parse().map_err(|_| {
             io::Error::new(io::ErrorKind::InvalidInput, "invalid content length")
-        }))))
+        })?))
     }
 }
 

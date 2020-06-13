@@ -70,7 +70,7 @@ impl Header {
     #[inline]
     pub fn new<T: Into<Vec<u8>>>(string: T) -> io::Result<Self> {
         let string = string.into();
-        let (key, value) = r#try!(Header::ranges(&string));
+        let (key, value) = Header::ranges(&string)?;
 
         Ok(Header {
             // The parser verifies the content is US-ASCII, so it's safe.

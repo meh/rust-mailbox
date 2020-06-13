@@ -35,9 +35,9 @@ impl Header for References {
             let start = slice.as_ptr() as usize - string.as_ptr() as usize;
             let end = start + slice.len();
 
-            ids.push(MessageId(r#try!(Address::new(
+            ids.push(MessageId(Address::new(
                 string.clone().map(|s| &s[start..end])
-            ))));
+            )?));
         }
 
         Ok(References(ids))

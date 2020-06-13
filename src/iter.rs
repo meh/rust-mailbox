@@ -51,18 +51,8 @@ impl<R: Read> Iterator for Iter<R> {
             };
         }
 
-        macro_rules! r#try {
-            ($body:expr) => {
-                match $body {
-                    Ok(value) => value,
-
-                    Err(err) => return Some(Err(err.into())),
-                }
-            };
-        }
-
         // The first entry must be an `Entry::Begin`.
-        let (offset, origin) = if let Entry::Begin(offset, origin) = r#try!(eof!(self.input.next()))
+        let (offset, origin) = if let Entry::Begin(offset, origin) = eof!(self.input.next()).ok()?
         {
             (offset, origin)
         } else {
@@ -78,7 +68,7 @@ impl<R: Read> Iterator for Iter<R> {
 
         // Read headers.
         loop {
-            match r#try!(eof!(self.input.next())) {
+            match eof!(self.input.next()).ok()? {
                 // This shouldn't happen.
                 Entry::Begin(..) => {
                     return Some(Err(io::Error::new(
@@ -111,7 +101,7 @@ impl<R: Read> Iterator for Iter<R> {
 
         // Read body if there is one.
         if !ended {
-            while let Entry::Body(value) = r#try!(eof!(self.input.next())) {
+            while let Entry::Body(value) = eof!(self.input.next()).ok()? {
                 if self.body {
                     body.append(value);
                 }

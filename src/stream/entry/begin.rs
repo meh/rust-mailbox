@@ -57,7 +57,7 @@ impl Begin {
     #[inline]
     pub fn new<T: Into<Vec<u8>>>(string: T) -> io::Result<Self> {
         let string = string.into();
-        let (address, timestamp) = r#try!(Begin::ranges(&string));
+        let (address, timestamp) = Begin::ranges(&string)?;
 
         Ok(Begin {
             // The parser verifies the content is US-ASCII, so it's safe.
