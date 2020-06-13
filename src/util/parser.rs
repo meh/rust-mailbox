@@ -12,8 +12,6 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-pub const WSP: &'static [u8] = b" \t";
-
 const NONE: u8 = 0b000;
 const PRINT: u8 = 0b001;
 const COLON: u8 = 0b010;

@@ -146,7 +146,7 @@ impl fmt::Display for Address {
 }
 
 mod parser {
-    use crate::util::parser::{is_ws, WSP};
+    use crate::util::parser::is_ws;
     use nom::branch::alt;
     use nom::bytes::complete::{is_not, take_till, take_until, take_while};
     use nom::character::complete::char;
