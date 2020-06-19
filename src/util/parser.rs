@@ -297,37 +297,6 @@ pub fn is_printable_no_colon(ch: u8) -> bool {
     unsafe { ASCII.get_unchecked(ch as usize) & (PRINT | COLON) == PRINT }
 }
 
-macro_rules! take_while_n {
-	($input:expr, $n:expr, $submac:ident!( $($args:tt)* )) => ({
-		let count = $n;
-
-		if $input.len() < count {
-			return Err($crate::nom::Err::Incomplete($crate::nom::Needed::Size(count)));
-		}
-
-		match $input.iter().take(count).position(|c| !$submac!(*c, $($args)*)) {
-			Some(n) => {
-				let res:$crate::nom::IResult<_,_> = if n == count {
-					Ok((&$input[n..], &$input[..n]))
-				}
-				else {
-					Err($crate::nom::Err::Error(error_position!(&$input[n..], $crate::nom::error::ErrorKind::Tag)))
-				};
-
-				res
-			},
-
-			None => {
-				Ok((&$input[($input).len()..], $input))
-			}
-		}
-	});
-
-	($input:expr, $n:expr, $f:expr) => (
-		take_while_n!($input, $n, call!($f));
-	);
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
