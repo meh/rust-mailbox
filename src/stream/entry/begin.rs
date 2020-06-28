@@ -31,21 +31,19 @@ impl Begin {
         let string = string.as_ref();
 
         if let Ok((_, (address, timestamp))) = parser::parse(string) {
-            if timestamp.len() == 24 {
-                let a = address.as_ptr() as usize - string.as_ptr() as usize;
-                let t = timestamp.as_ptr() as usize - string.as_ptr() as usize;
+            let a = address.as_ptr() as usize - string.as_ptr() as usize;
+            let t = timestamp.as_ptr() as usize - string.as_ptr() as usize;
 
-                return Ok((
-                    Range {
-                        start: a,
-                        end: a + address.len(),
-                    },
-                    Range {
-                        start: t,
-                        end: t + timestamp.len(),
-                    },
-                ));
-            }
+            return Ok((
+                Range {
+                    start: a,
+                    end: a + address.len(),
+                },
+                Range {
+                    start: t,
+                    end: t + timestamp.len(),
+                },
+            ));
         }
 
         Err(io::Error::new(
@@ -127,8 +125,9 @@ mod test {
     }
 
     #[test]
-    fn fail() {
-        assert!(Begin::new("From foo@example.com").is_err());
-        assert!(Begin::new("From foo@example.com Wed Nov 17 14:35:53 20109").is_err());
+    fn ok_gmail() {
+        let v = Begin::new("From 1668703170433825012@xxx Fri Jun 05 23:22:35 +0000 2020").unwrap();
+        assert_eq!(v.address(), "1668703170433825012@xxx");
+        assert_eq!(v.timestamp(), "Fri Jun 05 23:22:35 +0000 2020");
     }
 }
