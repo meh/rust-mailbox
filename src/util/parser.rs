@@ -279,22 +279,22 @@ static ASCII: [u8; 256] = [
 
 #[inline(always)]
 pub fn is_ws(ch: u8) -> bool {
-    unsafe { ASCII.get_unchecked(ch as usize) & SPACE != 0 }
+    ASCII[ch as usize] & SPACE != 0
 }
 
 #[inline(always)]
 pub fn is_printable(ch: u8) -> bool {
-    unsafe { ASCII.get_unchecked(ch as usize) & PRINT != 0 }
+    ASCII[ch as usize] & PRINT != 0
 }
 
 #[inline(always)]
 pub fn is_printable_or_ws(ch: u8) -> bool {
-    unsafe { ASCII.get_unchecked(ch as usize) & (PRINT | SPACE) != 0 }
+    ASCII[ch as usize] & (PRINT | SPACE) != 0
 }
 
 #[inline(always)]
 pub fn is_printable_no_colon(ch: u8) -> bool {
-    unsafe { ASCII.get_unchecked(ch as usize) & (PRINT | COLON) == PRINT }
+    ASCII[ch as usize] & (PRINT | COLON) == PRINT
 }
 
 #[cfg(test)]
