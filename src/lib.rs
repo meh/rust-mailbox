@@ -17,7 +17,6 @@ extern crate bitflags;
 extern crate fnv;
 extern crate owning_ref;
 
-#[macro_use]
 extern crate nom;
 extern crate casing;
 extern crate chrono;
