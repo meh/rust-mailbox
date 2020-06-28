@@ -28,9 +28,9 @@ impl Header for Lines {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(Lines(values[0].parse().map_err(
-            |_| io::Error::new(io::ErrorKind::InvalidInput, "invalid lines")
-        )?))
+        Ok(Lines(values[0].parse().map_err(|_| {
+            io::Error::new(io::ErrorKind::InvalidInput, "invalid lines")
+        })?))
     }
 }
 

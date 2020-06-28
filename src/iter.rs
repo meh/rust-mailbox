@@ -52,8 +52,7 @@ impl<R: Read> Iterator for Iter<R> {
         }
 
         // The first entry must be an `Entry::Begin`.
-        let (offset, origin) = if let Entry::Begin(offset, origin) = eof!(self.input.next()).ok()?
-        {
+        let (offset, origin) = if let Entry::Begin(offset, origin) = eof!(self.input.next()).ok()? {
             (offset, origin)
         } else {
             return Some(Err(io::Error::new(

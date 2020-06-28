@@ -89,8 +89,8 @@ impl Begin {
 
 mod parser {
     use crate::util::parser::{is_printable, is_printable_or_ws, is_ws};
-    use nom::sequence::tuple;
     use nom::bytes::complete::{tag, take_while, take_while1};
+    use nom::sequence::tuple;
     use nom::IResult;
 
     pub fn parse(input: &[u8]) -> IResult<&[u8], (&[u8], &[u8])> {

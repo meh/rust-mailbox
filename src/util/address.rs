@@ -69,7 +69,12 @@ impl Address {
     pub(crate) fn new(string: header::Item) -> io::Result<Self> {
         let (name, user, host) = Address::ranges(&string)?;
 
-        Ok(Address {inner: string, name, user, host})
+        Ok(Address {
+            inner: string,
+            name,
+            user,
+            host,
+        })
     }
 
     /// The name if any.

@@ -17,10 +17,10 @@ extern crate bitflags;
 extern crate fnv;
 extern crate owning_ref;
 
-extern crate nom;
 extern crate casing;
 extern crate chrono;
 extern crate mime;
+extern crate nom;
 
 #[macro_use]
 mod util;

@@ -26,7 +26,12 @@ pub struct Mail {
 impl Mail {
     #[inline]
     pub fn new(offset: u64, origin: stream::entry::Begin, headers: Headers, body: Body) -> Self {
-        Mail {offset, origin, headers, body}
+        Mail {
+            offset,
+            origin,
+            headers,
+            body,
+        }
     }
 
     #[inline]

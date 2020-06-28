@@ -36,7 +36,7 @@ impl Header for References {
             let end = start + slice.len();
 
             ids.push(MessageId(Address::new(
-                string.clone().map(|s| &s[start..end])
+                string.clone().map(|s| &s[start..end]),
             )?));
         }
 
