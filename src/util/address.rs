@@ -160,7 +160,7 @@ mod parser {
         let name = name.and_then(|s| {
             let value = str::from_utf8(s).unwrap().trim();
 
-            if value.len() > 0 {
+            if !value.is_empty() {
                 Some(value)
             } else {
                 None
