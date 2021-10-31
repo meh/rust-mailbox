@@ -29,9 +29,9 @@ impl Header for Date {
 
     #[inline]
     fn parse(values: &[header::Item]) -> io::Result<Self> {
-        Ok(DateTime::parse_from_rfc2822(values[0].as_ref())
+        DateTime::parse_from_rfc2822(values[0].as_ref())
             .map(Date)
-            .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid date"))?)
+            .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid date"))
     }
 }
 

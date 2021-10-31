@@ -43,11 +43,7 @@ impl<R: Read> Iterator for Iter<R> {
     fn next(&mut self) -> Option<Self::Item> {
         macro_rules! eof {
             ($body:expr) => {
-                if let Some(value) = $body {
-                    value
-                } else {
-                    return None;
-                }
+                self.input.next()?
             };
         }
 

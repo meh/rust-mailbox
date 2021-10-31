@@ -129,7 +129,7 @@ impl fmt::Display for Address {
             f.write_char('<')?;
         }
 
-        f.write_str(&self.user())?;
+        f.write_str(self.user())?;
 
         if let Some(host) = self.host() {
             f.write_char('@')?;

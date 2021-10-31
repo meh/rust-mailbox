@@ -93,9 +93,7 @@ impl<'a> Iterator for Iter<'a> {
                     } else {
                         self.child = self.parent.next().map(|v| v.iter());
 
-                        if self.child.is_none() {
-                            return None;
-                        }
+                        self.child.as_ref()?;
                     }
                 }
             }
