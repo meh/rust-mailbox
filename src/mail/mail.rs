@@ -12,45 +12,45 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-use stream;
-use super::{Headers, Body};
+use super::{Body, Headers};
+use crate::stream;
 
 #[derive(Clone, Debug)]
 pub struct Mail {
-	offset:  u64,
-	origin:  stream::entry::Begin,
-	headers: Headers,
-	body:    Body,
+    offset: u64,
+    origin: stream::entry::Begin,
+    headers: Headers,
+    body: Body,
 }
 
 impl Mail {
-	#[inline]
-	pub fn new(offset: u64, origin: stream::entry::Begin, headers: Headers, body: Body) -> Self {
-		Mail {
-			offset:  offset,
-			origin:  origin,
-			headers: headers,
-			body:    body,
-		}
-	}
+    #[inline]
+    pub fn new(offset: u64, origin: stream::entry::Begin, headers: Headers, body: Body) -> Self {
+        Mail {
+            offset,
+            origin,
+            headers,
+            body,
+        }
+    }
 
-	#[inline]
-	pub fn offset(&self) -> u64 {
-		self.offset
-	}
+    #[inline]
+    pub fn offset(&self) -> u64 {
+        self.offset
+    }
 
-	#[inline]
-	pub fn origin(&self) -> &stream::entry::Begin {
-		&self.origin
-	}
+    #[inline]
+    pub fn origin(&self) -> &stream::entry::Begin {
+        &self.origin
+    }
 
-	#[inline]
-	pub fn headers(&self) -> &Headers {
-		&self.headers
-	}
+    #[inline]
+    pub fn headers(&self) -> &Headers {
+        &self.headers
+    }
 
-	#[inline]
-	pub fn body(&self) -> &Body {
-		&self.body
-	}
+    #[inline]
+    pub fn body(&self) -> &Body {
+        &self.body
+    }
 }

@@ -12,109 +12,97 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use crate::mail::{Body, Headers, Mail};
+use crate::stream::{self, Entry};
 use std::io::{self, Read};
-use stream::{self, Entry};
-use mail::{Mail, Headers, Body};
 
 pub struct Iter<R: Read> {
-	input: stream::Iter<R>,
-	body:  bool,
+    input: stream::Iter<R>,
+    body: bool,
 }
 
 impl<R: Read> Iter<R> {
-	#[inline]
-	pub fn new(input: R) -> Self {
-		Iter {
-			input: stream::entries(input),
-			body:  true,
-		}
-	}
+    #[inline]
+    pub fn new(input: R) -> Self {
+        Iter {
+            input: stream::entries(input),
+            body: true,
+        }
+    }
 
-	#[inline]
-	pub fn body(&mut self, value: bool) -> &mut Self {
-		self.body = value;
-		self
-	}
+    #[inline]
+    pub fn body(&mut self, value: bool) -> &mut Self {
+        self.body = value;
+        self
+    }
 }
 
 impl<R: Read> Iterator for Iter<R> {
-	type Item = io::Result<Mail>;
+    type Item = io::Result<Mail>;
 
-	fn next(&mut self) -> Option<Self::Item> {
-		macro_rules! eof {
-			($body:expr) => (
-				if let Some(value) = $body {
-					value
-				}
-				else {
-					return None;
-				}
-			);
-		}
+    fn next(&mut self) -> Option<Self::Item> {
+        macro_rules! eof {
+            ($body:expr) => {
+                self.input.next()?
+            };
+        }
 
-		macro_rules! try {
-			($body:expr) => (
-				match $body {
-					Ok(value) =>
-						value,
+        // The first entry must be an `Entry::Begin`.
+        let (offset, origin) = if let Entry::Begin(offset, origin) = eof!(self.input.next()).ok()? {
+            (offset, origin)
+        } else {
+            return Some(Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "invalid state",
+            )));
+        };
 
-					Err(err) =>
-						return Some(Err(err.into()))
-				}
-			);
-		}
+        let mut headers = Headers::default();
+        let mut body = Body::default();
+        let mut ended = false;
 
-		// The first entry must be an `Entry::Begin`.
-		let (offset, origin) = if let Entry::Begin(offset, origin) = try!(eof!(self.input.next())) {
-			(offset, origin)
-		}
-		else {
-			return Some(Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid state")));
-		};
+        // Read headers.
+        loop {
+            match eof!(self.input.next()).ok()? {
+                // This shouldn't happen.
+                Entry::Begin(..) => {
+                    return Some(Err(io::Error::new(
+                        io::ErrorKind::InvalidInput,
+                        "invalid state",
+                    )));
+                }
 
-		let mut headers = Headers::default();
-		let mut body    = Body::default();
-		let mut ended   = false;
+                // Insert the header.
+                Entry::Header(header) => {
+                    headers.insert(header);
+                }
 
-		// Read headers.
-		loop {
-			match try!(eof!(self.input.next())) {
-				// This shouldn't happen.
-				Entry::Begin(..) => {
-					return Some(Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid state")));
-				}
+                // The body started.
+                Entry::Body(value) => {
+                    if self.body {
+                        body.append(value);
+                    }
 
-				// Insert the header.
-				Entry::Header(header) => {
-					headers.insert(header);
-				}
+                    break;
+                }
 
-				// The body started.
-				Entry::Body(value) => {
-					if self.body {
-						body.append(value);
-					}
+                // There was no body.
+                Entry::End => {
+                    ended = true;
+                    break;
+                }
+            }
+        }
 
-					break;
-				}
+        // Read body if there is one.
+        if !ended {
+            while let Entry::Body(value) = eof!(self.input.next()).ok()? {
+                if self.body {
+                    body.append(value);
+                }
+            }
+        }
 
-				// There was no body.
-				Entry::End => {
-					ended = true;
-					break;
-				}
-			}
-		}
-
-		// Read body if there is one.
-		if !ended {
-			while let Entry::Body(value) = try!(eof!(self.input.next())) {
-				if self.body {
-					body.append(value);
-				}
-			}
-		}
-
-		Some(Ok(Mail::new(offset, origin, headers, body)))
-	}
+        Some(Ok(Mail::new(offset, origin, headers, body)))
+    }
 }

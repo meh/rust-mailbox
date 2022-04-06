@@ -12,30 +12,30 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use super::Header;
+use crate::stream::entry::header;
+use crate::util::Address;
 use std::io;
 use std::ops::Deref;
-use stream::entry::header;
-use util::Address;
-use super::Header;
 
 pub struct ReturnPath(Address);
 
 impl Header for ReturnPath {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"Return-Path"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "Return-Path"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(ReturnPath(try!(Address::new(values[0].clone()))))
-	}
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        Ok(ReturnPath(Address::new(values[0].clone())?))
+    }
 }
 
 impl Deref for ReturnPath {
-	type Target = Address;
+    type Target = Address;
 
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }

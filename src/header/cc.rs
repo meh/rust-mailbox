@@ -12,40 +12,40 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use super::Header;
+use crate::stream::entry::header;
+use crate::util::Address;
 use std::io;
 use std::ops::Deref;
-use stream::entry::header;
-use util::Address;
-use super::Header;
 
 pub struct Cc(Vec<Address>);
 
 impl Header for Cc {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"Cc"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "Cc"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		let mut to     = Vec::new();
-		let     string = values[0].clone();
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        let mut to = Vec::new();
+        let string = values[0].clone();
 
-		for slice in string.split(',') {
-			let start = slice.as_ptr() as usize - string.as_ptr() as usize;
-			let end   = start + slice.len();
+        for slice in string.split(',') {
+            let start = slice.as_ptr() as usize - string.as_ptr() as usize;
+            let end = start + slice.len();
 
-			to.push(try!(Address::new(string.clone().map(|s| &s[start..end]))));
-		}
+            to.push(Address::new(string.clone().map(|s| &s[start..end]))?);
+        }
 
-		Ok(Cc(to))
-	}
+        Ok(Cc(to))
+    }
 }
 
 impl Deref for Cc {
-	type Target = [Address];
+    type Target = [Address];
 
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }

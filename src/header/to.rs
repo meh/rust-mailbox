@@ -12,30 +12,30 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use super::Header;
+use crate::stream::entry::header;
+use crate::util::Address;
 use std::io;
 use std::ops::Deref;
-use stream::entry::header;
-use util::Address;
-use super::Header;
 
 pub struct To(Address);
 
 impl Header for To {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"To"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "To"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(To(try!(Address::new(values[0].clone()))))
-	}
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        Ok(To(Address::new(values[0].clone())?))
+    }
 }
 
 impl Deref for To {
-	type Target = Address;
+    type Target = Address;
 
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }

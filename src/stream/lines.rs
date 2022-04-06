@@ -20,43 +20,39 @@ use std::io::{self, BufRead};
 pub struct Lines<R: BufRead>(R, u64);
 
 impl<R: BufRead> Lines<R> {
-	/// Create a new `Iterator` from the given input.
-	#[inline]
-	pub fn new(input: R) -> Self {
-		Lines(input, 0)
-	}
+    /// Create a new `Iterator` from the given input.
+    #[inline]
+    pub fn new(input: R) -> Self {
+        Lines(input, 0)
+    }
 }
 
 impl<R: BufRead> Iterator for Lines<R> {
-	type Item = io::Result<(u64, Vec<u8>)>;
+    type Item = io::Result<(u64, Vec<u8>)>;
 
-	#[inline]
-	fn next(&mut self) -> Option<Self::Item> {
-		let mut buffer = Vec::new();
-		let     offset = self.1;
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut buffer = Vec::new();
+        let offset = self.1;
 
-		match self.0.read_until(b'\n', &mut buffer) {
-			Ok(0) => {
-				None
-			}
+        match self.0.read_until(b'\n', &mut buffer) {
+            Ok(0) => None,
 
-			Ok(_) => {
-				self.1 += buffer.len() as u64;
+            Ok(_) => {
+                self.1 += buffer.len() as u64;
 
-				if buffer.last() == Some(&b'\n') {
-					buffer.pop();
+                if buffer.last() == Some(&b'\n') {
+                    buffer.pop();
 
-					if buffer.last() == Some(&b'\r') {
-						buffer.pop();
-					}
-				}
+                    if buffer.last() == Some(&b'\r') {
+                        buffer.pop();
+                    }
+                }
 
-				Some(Ok((offset, buffer)))
-			}
+                Some(Ok((offset, buffer)))
+            }
 
-			Err(e) => {
-				Some(Err(e))
-			}
-		}
-	}
+            Err(e) => Some(Err(e)),
+        }
+    }
 }

@@ -12,33 +12,34 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-use std::io;
-use std::ops::Deref;
-use std::net::IpAddr;
-use stream::entry::header;
 use super::Header;
+use crate::stream::entry::header;
+use std::io;
+use std::net::IpAddr;
+use std::ops::Deref;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct XRemoteAddr(IpAddr);
 
 impl Header for XRemoteAddr {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"X-Remote-Addr"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "X-Remote-Addr"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(XRemoteAddr(try!(values[0].parse().map_err(|_|
-			io::Error::new(io::ErrorKind::InvalidInput, "invalid IP address")))))
-	}
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        Ok(XRemoteAddr(values[0].parse().map_err(|_| {
+            io::Error::new(io::ErrorKind::InvalidInput, "invalid IP address")
+        })?))
+    }
 }
 
 impl Deref for XRemoteAddr {
-	type Target = IpAddr;
+    type Target = IpAddr;
 
-	#[inline]
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }

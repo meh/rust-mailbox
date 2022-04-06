@@ -14,33 +14,32 @@
 
 #[macro_use]
 extern crate bitflags;
-extern crate owning_ref;
 extern crate fnv;
+extern crate owning_ref;
 
-#[macro_use]
-extern crate nom;
 extern crate casing;
 extern crate chrono;
 extern crate mime;
+extern crate nom;
 
 #[macro_use]
 mod util;
-pub use util::Address;
+pub use crate::util::Address;
 
 pub mod header;
-pub use header::Header;
+pub use crate::header::Header;
 
 pub mod stream;
 
 pub mod mail;
-pub use mail::Mail;
+pub use crate::mail::Mail;
 
 mod iter;
-pub use iter::Iter;
+pub use crate::iter::Iter;
 
 use std::io::Read;
 
 #[inline]
 pub fn read<R: Read>(input: R) -> Iter<R> {
-	Iter::new(input)
+    Iter::new(input)
 }

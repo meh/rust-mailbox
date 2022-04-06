@@ -21,16 +21,16 @@ pub use self::lines::Lines;
 mod iter;
 pub use self::iter::Iter;
 
-use std::io::{Read, BufReader};
+use std::io::{BufReader, Read};
 
 /// Create an `Iterator` over line based entries.
 #[inline]
 pub fn entries<R: Read>(input: R) -> Iter<R> {
-	Iter::new(input)
+    Iter::new(input)
 }
 
 /// Create an `Iterator` over lines.
 #[inline]
 pub fn lines<R: Read>(input: R) -> Lines<BufReader<R>> {
-	Lines::new(BufReader::new(input))
+    Lines::new(BufReader::new(input))
 }

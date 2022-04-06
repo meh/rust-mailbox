@@ -12,30 +12,30 @@
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
+use super::Header;
+use crate::stream::entry::header;
+use crate::util::Address;
 use std::io;
 use std::ops::Deref;
-use stream::entry::header;
-use util::Address;
-use super::Header;
 
 pub struct XEnvelopeFrom(Address);
 
 impl Header for XEnvelopeFrom {
-	#[inline(always)]
-	fn name() -> &'static str {
-		"X-Envelope-From"
-	}
+    #[inline(always)]
+    fn name() -> &'static str {
+        "X-Envelope-From"
+    }
 
-	#[inline]
-	fn parse(values: &[header::Item]) -> io::Result<Self> {
-		Ok(XEnvelopeFrom(try!(Address::new(values[0].clone()))))
-	}
+    #[inline]
+    fn parse(values: &[header::Item]) -> io::Result<Self> {
+        Ok(XEnvelopeFrom(Address::new(values[0].clone())?))
+    }
 }
 
 impl Deref for XEnvelopeFrom {
-	type Target = Address;
+    type Target = Address;
 
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
